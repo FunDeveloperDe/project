@@ -82,8 +82,8 @@ window.__SITE_CONFIG__ = {
   ],
   },
   skills: {
-    eyebrow: 'Core Expertise',
-    title: 'Main areas I work on across Roblox projects',
+    eyebrow: 'Any feedback regarding my portfolio or projects?',
+    title: 'Dm me on discord via vantyx_999',
     groups: [
       {
         category: 'Systems',
