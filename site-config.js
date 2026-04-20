@@ -81,24 +81,7 @@ window.__SITE_CONFIG__ = {
     },
   ],
   },
-  skills: {
-    eyebrow: 'Site Sections',
-    title: 'Core content areas you can customize',
-    groups: [
-      {
-        category: 'Branding',
-        items: ['Brand name', 'Badge text', 'Hero copy', 'Calls to action', 'Navigation labels'],
-      },
-      {
-        category: 'Content',
-        items: ['About text', 'Services', 'Features', 'Project entries', 'Footer copy'],
-      },
-      {
-        category: 'Links',
-        items: ['YouTube URLs', 'Email links', 'Phone links', 'Social links', 'Contact actions'],
-      },
-    ],
-  },
+  
   projects: {
     eyebrow: 'Featured Work',
     title: 'Project cards you can add, remove, and reorder from one file',
