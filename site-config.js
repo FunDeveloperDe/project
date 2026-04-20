@@ -32,7 +32,7 @@ window.__SITE_CONFIG__ = {
     secondaryCta: 'Get in touch',
     availabilityLabel: 'Currently Working On',
     availability:
-      'Creating full games from scratch aswell as standalone systems and fixing bug s.',
+      'Creating full games from scratch aswell as standalone systems .',
   },
   about: {
     eyebrow: 'About',
@@ -80,6 +80,42 @@ window.__SITE_CONFIG__ = {
         'Dynamic, modular UI frameworks, shop systems, feedback systems, and responsive interfaces that integrate seamlessly with backend logic.',
     },
   ],
+  },
+  skills: {
+    eyebrow: 'Core Expertise',
+    title: 'Main areas I work on across Roblox projects',
+    groups: [
+      {
+        category: 'Systems',
+        items: [
+          'Backend architecture',
+          'Gameplay mechanics',
+          'Procedural generation',
+          'Cross-server systems',
+          'Optimization',
+        ],
+      },
+      {
+        category: 'Specialties',
+        items: [
+          'Combat systems',
+          'Movement systems',
+          'Inventory and quests',
+          'NPC AI',
+          'Anti-cheat and validation',
+        ],
+      },
+      {
+        category: 'Tools',
+        items: [
+          'Roblox Lua',
+          'MemoryStore',
+          'DataStore',
+          'HTTP integrations',
+          'Modular frameworks',
+        ],
+      },
+    ],
   },
   
   projects: {
