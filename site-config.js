@@ -84,105 +84,142 @@ window.__SITE_CONFIG__ = {
   
   projects: {
     eyebrow: 'Featured Work',
-    title: 'Project cards you can add, remove, and reorder from one file',
+    title: 'Some of the systems i have created myself',
     intro:
-      'Each card reads from this config, including the outbound video link, so updating the showcase is straightforward.',
+      'If you have any feedback regarding the systems you can give it to me via discordz  ',
     previewLabel: 'Video link',
     items: [
       {
-        title: 'Spring Product Launch',
-        category: 'Campaign Site',
-        description:
-          'A customer-facing launch page focused on product positioning, feature storytelling, and stronger conversion moments.',
-        outcome: 'Built to make campaign updates easy without reworking the underlying layout.',
-        stack: ['React', 'TypeScript', 'Tailwind', 'Framer Motion'],
-        videoUrl: 'https://www.youtube.com/watch?v=3fumBcKC6RE',
-      },
+  title: 'Spider-Man Movement System',
+  category: 'Advanced Spiderman+movement system',
+  description:
+    'A physics-based traversal system featuring web-swinging, wall-running, and surface climbing. Includes dynamic camera tilt and motion blur to enhance the experience.',
+  outcome:
+    'Built for smooth, responsive movement with seamless transitions between swinging, sprinting, and wall running, maintaining stability at high speeds.',
+  stack: ['Roblox Lua', 'Physics simulation', 'Raycasting', 'Camera systems', 'Input handling'],
+  videoUrl: 'https://youtu.be/PsKBOt1Od14',
+},
       {
-        title: 'Service Overview Experience',
-        category: 'Marketing Website',
-        description:
-          'A structured service page with modular content blocks, proof sections, and a clear contact path for new visitors.',
-        outcome: 'Designed so sections can be refreshed quickly as the offer evolves.',
-        stack: ['Responsive UI', 'Content modeling', 'Reusable sections', 'Animation'],
-        videoUrl: 'https://www.youtube.com/watch?v=3fumBcKC6RE',
-      },
+  title: 'FPS Pistol System',
+  category: 'First-person gun system',
+  description:
+    'A first-person shooter system featuring a viewmodel-based pistol with responsive shooting mechanics.',
+  outcome:
+    'Built for smooth and responsive gunplay, with synchronized animations, accurate hit detection, and immersive first-person visuals.',
+  stack: ['Roblox Lua', 'Viewmodel system', 'Raycasting', 'Camera control', 'Input handling'],
+  videoUrl: 'https://youtu.be/V3xgPGcSTic',
+},
+{
+  title: 'Web-Based Game Administration System',
+  category: 'Backend system + cross-server control',
+  description:
+    'A web-to-game integration system that allows administrators to manage and control a live Roblox game from an external website. Commands are sent from the web interface and executed in real time across all active servers and players.',
+  outcome:
+    'Built for centralized control and scalability, enabling secure command execution, cross-server synchronization, and real-time administration without needing in-game access.',
+  stack: ['Roblox Lua', 'HTTPService', 'Web API', 'Cross-server messaging', 'Authentication'],
+  videoUrl: 'https://youtu.be/zKCMLSKQytY',
+},
       {
-        title: 'Consumer App Waitlist Page',
-        category: 'Acquisition Funnel',
-        description:
-          'A simple but polished page for introducing a product, explaining benefits, and directing users into a signup flow.',
-        outcome: 'The content structure supports iteration without scattering copy across multiple files.',
-        stack: ['Product messaging', 'CTA flow', 'Video embed', 'Editable config'],
-        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      },
+  title: 'Procedural Terrain Generation System',
+  category: 'World generation system+chunk based loading',
+  description:
+    'A procedural terrain system that generates diverse biomes with environment-specific assets, including trees, structures, and scattered objects based on biome type.Includes chunk based loading to include extra performance',
+  outcome:
+    'Built for scalable world generation with consistent biome distribution, randomized structure placement, and dynamic environment variation.',
+  stack: ['Roblox Lua', 'Procedural generation', 'Noise algorithms', 'Randomization', 'Asset spawning'],
+  videoUrl: 'https://youtu.be/rTRbfrchyrE',
+},
+
+{
+  title: 'Raycast Rendering System',
+  category: 'Rendering system + lighting simulation',
+  description:
+    'A custom rendering system that uses raycasting to simulate a scene projection within Roblox, detecting geometry and surfaces in real time to recreate a rendered view.',
+  outcome:
+    'Built to dynamically respond to environment lighting, including sunlight influence, creating a real-time visual simulation driven entirely by ray-based calculations.',
+  stack: ['Roblox Lua', 'Raycasting', 'Rendering logic', 'Lighting simulation', 'Optimization'],
+  videoUrl: 'https://youtu.be/JkfpLhObRBQ',
+},
     ],
   },
   terminal: {
     eyebrow: 'Quick Info',
-    title: 'An interactive info panel with configurable responses',
-    intro:
-      'This section is still editable from the same config file, including command text, labels, and helper prompts.',
-    initialMessage: 'Info panel ready. Type "help" to explore.',
-    commands: {
-      help: [
-        'Available commands:',
-        '  help      Show the command list',
-        '  brand     Learn what this site is set up for',
-        '  services  See the main content use cases',
-        '  stack     View the editable site areas',
-        '  contact   Get the configured contact options',
-        '  confetti  Launch a confetti burst',
-        '  fireworks Launch animated fireworks',
-        '  matrix    Start a matrix code rain effect',
-        '  glitch    Trigger a glitch pulse overlay',
-        '  blackhole Open a black hole distortion',
-        '  clear     Reset the panel',
-      ],
-      brand: ['This starter is configured for a consumer-facing website instead of a personal portfolio.'],
-      services: ['Landing pages, product marketing, proof sections, and fast content updates from one config file.'],
-      stack: ['Brand copy, projects, video links, contact methods, labels, and footer text all live in site-config.js.'],
-      contact: ['Use the contact section below to swap in your preferred email, phone number, or social channels.'],
-    },
-    quickCommands: ['help', 'brand', 'services', 'stack', 'contact', 'matrix', 'glitch', 'blackhole'],
-    visualCommands: ['confetti', 'fireworks', 'matrix', 'glitch', 'blackhole'],
-    panelLabel: 'Command Panel',
-    panelDescription: 'Interactive shortcuts, visuals, and quick site info',
-    visualsEnabledLabel: 'Visual commands enabled',
-    feedLabel: 'Terminal feed',
-    promptLabel: 'Type a command',
-    processingLabel: 'Checking...',
-    inputPlaceholder: 'Try "help", "matrix", "glitch", or "blackhole"',
-    unknownCommandPrefix: 'Unknown command:',
-    visualResponses: {
-      confetti: 'Confetti burst launched.',
-      fireworks: 'Fireworks sequence launched.',
-      matrix: 'Matrix code rain engaged.',
-      glitch: 'Glitch pulse engaged.',
-      blackhole: 'Black hole distortion opened.',
-    },
+title: 'Interactive System Panel',
+intro:
+  'Use commands to explore systems, projects, and backend capabilities.',
+initialMessage: 'System panel ready. Type "help" to explore available commands.',
+commands: {
+  help: [
+    'Available commands:',
+    '  help      Show the command list',
+    '  systems   View core systems and mechanics',
+    '  backend   Learn about backend & infrastructure',
+    '  gameplay  Explore gameplay systems',
+    '  stack     View technologies and tools',
+    '  contact   Get contact information',
+    '  confetti  Launch a confetti burst',
+    '  fireworks Launch animated fireworks',
+    '  matrix    Start a matrix code rain effect',
+    '  glitch    Trigger a glitch pulse overlay',
+    '  blackhole Open a black hole distortion',
+    '  clear     Reset the panel',
+  ],
+  systems: [
+    'Includes advanced systems such as procedural generation, FPS mechanics, vehicle systems, movement systems, and AI-driven gameplay.',
+  ],
+  backend: [
+    'Scalable backend systems using DataStore, MemoryStore, cross-server messaging, and web integration for real-time control.',
+  ],
+  gameplay: [
+    'Custom mechanics including combat, abilities, traversal systems, building, inventory, and interactive environments.',
+  ],
+  stack: [
+    'JavaScript, Roblox Lua, raycasting, physics simulation, procedural generation, camera systems, and modular architecture.',
+  ],
+  contact: [
+    'Use the contact section below to connect via Discord or other preferred methods.',
+  ],
+},
+quickCommands: ['help', 'systems', 'backend', 'gameplay', 'stack', 'contact', 'matrix', 'glitch', 'blackhole'],
+visualCommands: ['confetti', 'fireworks', 'matrix', 'glitch', 'blackhole'],
+panelLabel: 'Command Panel',
+panelDescription: 'Interactive system overview and controls',
+visualsEnabledLabel: 'Visual commands enabled',
+feedLabel: 'System feed',
+promptLabel: 'Enter command',
+processingLabel: 'Processing...',
+inputPlaceholder: 'Try "help", "systems", "backend", or "matrix"',
+unknownCommandPrefix: 'Unknown command:',
+visualResponses: {
+  confetti: 'Confetti burst launched.',
+  fireworks: 'Fireworks sequence launched.',
+  matrix: 'Matrix code rain engaged.',
+  glitch: 'Glitch pulse engaged.',
+  blackhole: 'Black hole distortion opened.',
+},
   },
   contact: {
     eyebrow: 'Contact',
-    title: 'Use any contact method that fits the brand',
+    title: 'you can contact me via discord',
     description:
-      'These contact rows are also managed from the same config file, so you can replace them with email, phone, social, or support links.',
-    methods: [{ label: 'Discord', value: 'dokja' }],
+      '',
+    methods: [{ label: 'Discord', value: 'vantyx_999' }],
   },
   footer: {
     left: '',
     right: '',
   },
-  boot: {
-    label: 'Preparing website content',
-    steps: [
-      'Loading brand and hero copy',
-      'Linking editable project videos',
-      'Preparing service and contact sections',
-      'Launching the site',
-    ],
-    loadingLabel: 'Loading',
-    readyLabel: 'Ready',
-    queuedLabel: 'Queued',
-  },
+ boot: {
+  label: 'Initializing systems',
+  steps: [
+    'Loading core modules',
+    'Connecting backend services',
+    'Initializing gameplay systems',
+    'Syncing cross-server state',
+    'Launching interface',
+  ],
+  loadingLabel: 'Loading',
+  readyLabel: 'Ready',
+  queuedLabel: 'Queued',
+},
 };
