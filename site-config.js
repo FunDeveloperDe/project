@@ -11,7 +11,7 @@ window.__SITE_CONFIG__ = {
     taglinePhrases: [
       'High-performance game systems',
       'Scalable backend architecture',
-      'Built for production environments',
+      'Built for highest quality',
     ],
   },
   navigation: [
@@ -24,51 +24,62 @@ window.__SITE_CONFIG__ = {
     { id: 'contact', label: 'Contact' },
   ],
   hero: {
-    eyebrow: 'Roblox scripting & system design',
-    title: 'Production-ready Roblox systems built for performance, scalability, and clean architecture.',
+    eyebrow: 'Roblox scripting',
+    title: 'Production-ready Roblox systems built for performance, scalability, and exapnsion.',
     description:
-      'From DataStores and MemoryStore systems to gameplay mechanics and UI frameworks, everything is designed to be efficient, maintainable, and scalable across large player bases.',
+      'From DataStores and MemoryStore systems to gameplay mechanics and full games, everything is designed to be efficient, maintainable, and scalable across large player bases.',
     primaryCta: 'View projects',
     secondaryCta: 'Get in touch',
     availabilityLabel: 'Currently Working On',
     availability:
-      'Game systems, backend logic, optimization, and advanced mechanics for Roblox experiences.',
+      'Creating full games from scratch aswell as standalone systems and fixing bug s.',
   },
   about: {
     eyebrow: 'About',
     title: 'Focused on building clean, scalable systems for Roblox games',
     paragraphs: [
       'Vantyx specializes in backend systems, gameplay mechanics, and structured scripting designed for long-term scalability. Every system is written with performance and maintainability in mind.',
-      'Projects include DataStore pipelines, MemoryStore systems, modular frameworks, and advanced gameplay logic. Code is structured to be expandable and production-ready.',
+      'Projects include DataStore pipelines, MemoryStore systems, modular frameworks,full games, simulators,economy,car driving systems, fighting systems, movement systems,ability systems,npcs ai systems, building systems, inventory systems,quest systems, quests systems,queue sytems, anticheat systems,party system,frontend systems and more . Code is structured to be expandable and production-ready.',
     ],
     highlights: [
       'Modular architecture',
       'Optimized performance',
       'Scalable systems',
       'Clean code structure',
+      'Easily expandabl',
     ],
-    highlightValueLabel: 'Active Systems',
+    highlightValueLabel: 'ready',
   },
   services: {
     eyebrow: 'What I Build',
-    title: 'Core systems and mechanics for Roblox games',
-    items: [
-      {
-        title: 'Backend systems',
-        description:
-          'DataStore, MemoryStore, and server-client architecture built for reliability, scaling, and data integrity.',
-      },
-      {
-        title: 'Gameplay mechanics',
-        description:
-          'Custom systems like vehicles, combat, abilities, placement systems, and interactive environments.',
-      },
-      {
-        title: 'Optimization & structure',
-        description:
-          'Refactoring, performance optimization, and modular scripting to improve efficiency and maintainability.',
-      },
-    ],
+  title: 'Production-ready systems and mechanics for Roblox games',
+  items: [
+    {
+      title: 'Backend & Data Systems',
+      description:
+        'Scalable DataStore pipelines, MemoryStore-driven systems, global economies, queue systems, and secure server-client architectures designed for reliability, persistence, and high player counts.',
+    },
+    {
+      title: 'Gameplay Systems',
+      description:
+        'Advanced mechanics including vehicles, combat, abilities, movement systems, NPC AI, building systems, inventories, quests, and fully integrated gameplay loops for complete experiences.',
+    },
+    {
+      title: 'Multiplayer & Infrastructure',
+      description:
+        'Party systems, matchmaking, round systems, server synchronization, and cross-server communication built for smooth multiplayer experiences and scalable game architecture.',
+    },
+    {
+      title: 'Security & Optimization',
+      description:
+        'Anti-cheat systems, server validation, performance optimization, and structured scripting focused on stability, exploit prevention, and efficient execution.',
+    },
+    {
+      title: 'Frontend & UI Systems',
+      description:
+        'Dynamic, modular UI frameworks, shop systems, feedback systems, and responsive interfaces that integrate seamlessly with backend logic.',
+    },
+  ],
   },
   skills: {
     eyebrow: 'Site Sections',
