@@ -1,4 +1,4 @@
-import { useRef, useState, ReactNode } from 'react';
+import { type ReactNode, type RefObject, useRef, useState } from 'react';
 
 interface MagneticButtonProps {
   children: ReactNode;
@@ -15,7 +15,7 @@ export default function MagneticButton({
   href,
   onClick
 }: MagneticButtonProps) {
-  const elementRef = useRef<HTMLButtonElement | HTMLAnchorElement>(null);
+  const elementRef = useRef<HTMLElement>(null);
   const offsetX = useRef(0);
   const offsetY = useRef(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -70,19 +70,15 @@ export default function MagneticButton({
     decay();
   };
 
-  const props = {
-    ref: elementRef,
-    className,
-    onMouseMove: handleMouseMove,
-    onMouseLeave: handleMouseLeave,
-    style: { willChange: 'transform' }
-  };
-
   if (as === 'a') {
     return (
       <a
-        {...props}
+        ref={elementRef as RefObject<HTMLAnchorElement>}
+        className={className}
         href={href}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ willChange: 'transform' }}
       >
         {children}
       </a>
@@ -91,8 +87,12 @@ export default function MagneticButton({
 
   return (
     <button
-      {...props}
+      ref={elementRef as RefObject<HTMLButtonElement>}
+      className={className}
       onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ willChange: 'transform' }}
     >
       {children}
     </button>

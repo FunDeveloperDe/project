@@ -28,15 +28,15 @@ export default function BootSequence({
       timeouts.push(
         window.setTimeout(() => {
           setActiveStep(index);
-        }, 420 + index * 500)
+        }, 300 + index * 360)
       );
     });
 
     timeouts.push(
       window.setTimeout(() => {
         setShow(false);
-        window.setTimeout(onComplete, 260);
-      }, 420 + steps.length * 500 + 500)
+        window.setTimeout(onComplete, 240);
+      }, 300 + steps.length * 360 + 420)
     );
 
     return () => {
@@ -53,39 +53,43 @@ export default function BootSequence({
       <motion.div
         initial={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.35 }}
-        className="fixed inset-0 z-[9999] flex items-center justify-center bg-[radial-gradient(circle_at_top,rgba(52,211,153,0.14),transparent_35%),linear-gradient(180deg,#07110c_0%,#0b1510_100%)] px-6"
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-[var(--bg)] px-5"
       >
-        <div className="w-full max-w-2xl">
-          <p className="text-sm uppercase tracking-[0.32em] text-emerald-200/70">{label}</p>
-          <div className="mt-8 grid gap-5">
-            {steps.map((step, index) => {
-              const isDone = index < activeStep;
-              const isActive = index === activeStep;
+        <div className="human-card signal-line w-full max-w-2xl overflow-hidden p-6 sm:p-8">
+          <div className="relative z-10">
+            <p className="section-kicker">{label}</p>
+            <div className="mt-7 grid gap-3">
+              {steps.map((step, index) => {
+                const isDone = index < activeStep;
+                const isActive = index === activeStep;
 
-              return (
-                <motion.div
-                  key={step}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="grid grid-cols-[auto,1fr,auto] items-center gap-4 border-b border-white/[0.08] pb-4"
-                >
-                  <span
-                    className={`flex h-9 w-9 items-center justify-center rounded-full border text-sm ${
-                      isDone || isActive
-                        ? 'border-emerald-300/40 bg-emerald-300/10 text-emerald-200'
-                        : 'border-white/10 text-zinc-500'
-                    }`}
+                return (
+                  <motion.div
+                    key={step}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="grid grid-cols-[auto,1fr,auto] items-center gap-4 border-b border-[var(--line)] pb-3"
                   >
-                    {index + 1}
-                  </span>
-                  <span className={isDone || isActive ? 'text-zinc-100' : 'text-zinc-500'}>{step}</span>
-                  <span className="min-w-24 text-right text-xs uppercase tracking-[0.24em] text-zinc-500">
-                    {isDone ? readyLabel : isActive ? loadingLabel : queuedLabel}
-                  </span>
-                </motion.div>
-              );
-            })}
+                    <span
+                      className={`flex h-9 w-9 items-center justify-center rounded-[8px] border text-sm font-bold ${
+                        isDone || isActive
+                          ? 'border-[rgba(191,77,42,0.28)] bg-[rgba(191,77,42,0.1)] text-[var(--accent)]'
+                          : 'border-[var(--line)] text-[var(--soft)]'
+                      }`}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className={isDone || isActive ? 'font-semibold text-[var(--ink)]' : 'text-[var(--muted)]'}>
+                      {step}
+                    </span>
+                    <span className="min-w-20 text-right text-xs font-bold text-[var(--soft)]">
+                      {isDone ? readyLabel : isActive ? loadingLabel : queuedLabel}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </motion.div>

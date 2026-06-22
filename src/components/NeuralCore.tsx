@@ -44,7 +44,8 @@ export default function NeuralCore({ scrollRef }: NeuralCoreProps) {
   const mouseRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const container = containerRef.current;
+    if (!container) return;
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x000000, 0.012);
@@ -65,7 +66,7 @@ export default function NeuralCore({ scrollRef }: NeuralCoreProps) {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
-    containerRef.current.appendChild(renderer.domElement);
+    container.appendChild(renderer.domElement);
 
     const nodeCount = isLowEnd ? 60 : 120;
     const nodes: THREE.Mesh[] = [];
@@ -269,7 +270,7 @@ export default function NeuralCore({ scrollRef }: NeuralCoreProps) {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
-      containerRef.current?.removeChild(renderer.domElement);
+      container.removeChild(renderer.domElement);
       renderer.dispose();
     };
   }, [scrollRef]);

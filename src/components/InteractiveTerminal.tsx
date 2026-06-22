@@ -405,22 +405,22 @@ export default function InteractiveTerminal({
         </AnimatePresence>
       </div>
 
-      <div className="relative overflow-hidden rounded-[1.75rem] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(12,19,15,0.92),rgba(8,14,11,0.96))] shadow-[0_30px_90px_rgba(0,0,0,0.3)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(52,211,153,0.12),transparent_32%)]" />
+      <div className="paper-panel relative overflow-hidden bg-[var(--ink)] text-[var(--surface)]">
+        <div className="absolute inset-0 opacity-[0.13] [background-image:linear-gradient(90deg,rgba(255,250,242,0.18)_1px,transparent_1px),linear-gradient(180deg,rgba(255,250,242,0.18)_1px,transparent_1px)] [background-size:34px_34px]" />
 
-        <div className="relative z-10 border-b border-white/[0.08] px-5 py-4">
+        <div className="relative z-10 border-b border-white/10 px-5 py-5">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/[0.12] text-emerald-200">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[10px] bg-[rgba(231,179,90,0.14)] text-[var(--accent-3)]">
                 <TerminalSquare size={20} />
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">{panelLabel}</p>
-                <p className="mt-1 text-sm text-zinc-300">{panelDescription}</p>
+                <p className="text-xs font-bold uppercase tracking-[0.08em] text-[rgba(255,250,242,0.58)]">{panelLabel}</p>
+                <p className="mt-1 text-sm text-[rgba(255,250,242,0.72)]">{panelDescription}</p>
               </div>
             </div>
 
-            <div className="hidden items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-2 text-xs uppercase tracking-[0.2em] text-emerald-200 md:flex">
+            <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-3 py-2 text-xs font-bold text-[var(--accent-3)] md:flex">
               <Sparkles size={14} />
               {visualsEnabledLabel}
             </div>
@@ -430,8 +430,9 @@ export default function InteractiveTerminal({
             {quickCommandItems.map((command) => (
               <button
                 key={command}
+                type="button"
                 onClick={() => handleCommand(command)}
-                className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/30 hover:bg-emerald-300/[0.08] hover:text-white"
+                className="min-h-9 rounded-full border border-white/10 bg-white/[0.06] px-3 py-1.5 text-xs font-bold text-[rgba(255,250,242,0.72)] transition hover:border-[rgba(231,179,90,0.45)] hover:bg-[rgba(231,179,90,0.12)] hover:text-[var(--surface)]"
               >
                 {command}
               </button>
@@ -440,7 +441,7 @@ export default function InteractiveTerminal({
         </div>
 
         <div className="relative z-10 px-5 pb-5 pt-4">
-          <div className="mb-4 flex items-center justify-between text-xs uppercase tracking-[0.24em] text-zinc-500">
+          <div className="mb-4 flex items-center justify-between text-xs font-bold uppercase tracking-[0.08em] text-[rgba(255,250,242,0.5)]">
             <span className="inline-flex items-center gap-2">
               <Command size={14} />
               {feedLabel}
@@ -450,7 +451,7 @@ export default function InteractiveTerminal({
 
           <div
             ref={terminalRef}
-            className="max-h-[24rem] min-h-[18rem] space-y-2 overflow-y-auto rounded-2xl border border-white/[0.06] bg-black/20 p-4 font-mono text-sm shadow-inner shadow-black/20"
+            className="max-h-[24rem] min-h-[18rem] space-y-2 overflow-y-auto rounded-[12px] border border-white/10 bg-black/20 p-4 font-mono text-sm shadow-inner shadow-black/20"
           >
             <AnimatePresence initial={false}>
               {history.map((entry, index) => (
@@ -461,31 +462,32 @@ export default function InteractiveTerminal({
                   transition={{ duration: 0.18 }}
                   className={
                     entry.type === 'system'
-                      ? 'text-zinc-500'
+                      ? 'text-[rgba(255,250,242,0.52)]'
                       : entry.type === 'user'
-                        ? 'text-white'
+                        ? 'text-[var(--surface)]'
                         : entry.type === 'error'
-                          ? 'text-rose-300'
-                          : 'text-emerald-200'
+                          ? 'text-[#ffb4a8]'
+                          : 'text-[#9fd8cf]'
                   }
                 >
-                  {entry.type === 'user' && <span className="mr-2 text-emerald-300">$</span>}
+                  {entry.type === 'user' && <span className="mr-2 text-[var(--accent-3)]">$</span>}
                   {entry.content}
                 </motion.div>
               ))}
             </AnimatePresence>
 
             {isProcessing ? (
-              <div className="pt-2 text-emerald-200">{processingLabel}</div>
+              <div className="pt-2 text-[#9fd8cf]">{processingLabel}</div>
             ) : (
-              <div className="sticky bottom-0 flex items-center gap-2 border-t border-white/[0.08] bg-[linear-gradient(180deg,rgba(8,12,10,0),rgba(8,12,10,0.88)_45%,rgba(8,12,10,0.98)_100%)] pt-4">
-                <span className="text-emerald-300">$</span>
+              <div className="sticky bottom-0 flex items-center gap-2 border-t border-white/10 bg-[linear-gradient(180deg,rgba(23,19,15,0),rgba(23,19,15,0.88)_45%,rgba(23,19,15,0.98)_100%)] pt-4">
+                <span className="text-[var(--accent-3)]">$</span>
                 <input
                   type="text"
+                  aria-label={promptLabel}
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   onKeyDown={handleKeyDown}
-                  className="flex-1 bg-transparent text-white outline-none placeholder:text-zinc-600"
+                  className="min-w-0 flex-1 bg-transparent text-[var(--surface)] outline-none placeholder:text-[rgba(255,250,242,0.34)]"
                   placeholder={inputPlaceholder}
                 />
               </div>

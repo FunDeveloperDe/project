@@ -3,40 +3,20 @@ import { motion } from 'framer-motion';
 export default function MinimalOrbBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(52,211,153,0.14),transparent_24%),radial-gradient(circle_at_82%_20%,rgba(163,230,53,0.08),transparent_24%),radial-gradient(circle_at_50%_55%,rgba(52,211,153,0.06),transparent_32%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(191,77,42,0.1),transparent_24rem),radial-gradient(circle_at_82%_16%,rgba(37,111,104,0.1),transparent_22rem),linear-gradient(180deg,rgba(255,250,242,0.62),rgba(247,243,236,0.92))]" />
+      <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(90deg,rgba(23,19,15,0.12)_1px,transparent_1px),linear-gradient(180deg,rgba(23,19,15,0.12)_1px,transparent_1px)] [background-size:88px_88px]" />
 
-      <div className="absolute inset-0 hidden items-center justify-center lg:flex">
-        <div className="relative h-[42rem] w-[42rem] [perspective:1600px]">
-          <motion.div
-            animate={{ rotateX: [66, 66], rotateY: [0, 360] }}
-            transition={{ duration: 26, repeat: Infinity, ease: 'linear' }}
-            className="absolute left-1/2 top-1/2 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 [transform-style:preserve-3d]"
-          >
-            <div className="absolute inset-0 rounded-full border border-emerald-300/25 shadow-[0_0_120px_rgba(52,211,153,0.12)]" />
-            <div className="absolute inset-10 rounded-full border border-white/12" />
-            <div className="absolute inset-[5.5rem] rounded-full border border-emerald-200/12" />
-            <div className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-300/[0.12] blur-3xl" />
-          </motion.div>
-
-          <motion.div
-            animate={{ rotateX: [72, 72], rotateY: [360, 0] }}
-            transition={{ duration: 34, repeat: Infinity, ease: 'linear' }}
-            className="absolute left-1/2 top-1/2 h-[34rem] w-[34rem] -translate-x-1/2 -translate-y-1/2 [transform-style:preserve-3d]"
-          >
-            <div className="absolute inset-0 rounded-full border border-white/8" />
-            <div className="absolute inset-16 rounded-full border border-emerald-300/10" />
-          </motion.div>
-
-          <motion.div
-            animate={{ rotateZ: [0, 360] }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
-            className="absolute left-1/2 top-1/2 h-[18rem] w-[18rem] -translate-x-1/2 -translate-y-1/2 rounded-full border border-emerald-300/15"
-          />
-        </div>
-      </div>
-
-      <div className="absolute left-[-5rem] top-40 hidden h-56 w-56 rounded-full border border-emerald-300/10 lg:block" />
-      <div className="absolute right-[-3rem] bottom-24 hidden h-40 w-40 rounded-full border border-white/10 lg:block" />
+      <motion.div
+        animate={{ x: [0, 18, 0], y: [0, -10, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute right-[7%] top-28 hidden h-64 w-64 rounded-full border border-[rgba(191,77,42,0.18)] lg:block"
+      />
+      <motion.div
+        animate={{ x: [0, -14, 0], y: [0, 16, 0] }}
+        transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+        className="absolute bottom-28 left-[6%] hidden h-48 w-48 rounded-full border border-[rgba(37,111,104,0.18)] lg:block"
+      />
+      <div className="absolute bottom-[-14rem] right-[-10rem] h-[30rem] w-[30rem] rotate-12 border border-[rgba(23,19,15,0.08)]" />
     </div>
   );
 }

@@ -37,11 +37,11 @@ export default function TypingTagline({ phrases }: TypingTaglineProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-emerald-100/[0.92]">{text}</span>
+      <span className="min-h-7 text-[var(--accent-2)]">{text}</span>
       <motion.span
         animate={{ opacity: [1, 0, 1] }}
         transition={{ duration: 0.8, repeat: Infinity }}
-        className="inline-block h-6 w-0.5 bg-emerald-300"
+        className="inline-block h-6 w-0.5 bg-[var(--accent)]"
       />
     </div>
   );

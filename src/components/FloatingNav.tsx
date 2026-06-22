@@ -3,15 +3,16 @@ import { motion } from 'framer-motion';
 import type { SiteNavItem } from '../siteConfig';
 
 interface FloatingNavProps {
+  brandName: string;
   items: SiteNavItem[];
 }
 
-export default function FloatingNav({ items }: FloatingNavProps) {
+export default function FloatingNav({ brandName, items }: FloatingNavProps) {
   const [activeSection, setActiveSection] = useState('home');
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIsVisible(true), 250);
+    const timer = window.setTimeout(() => setIsVisible(true), 180);
 
     const observers = items.map((item) => {
       const element = document.getElementById(item.id);
@@ -25,7 +26,7 @@ export default function FloatingNav({ items }: FloatingNavProps) {
             setActiveSection(item.id);
           }
         },
-        { threshold: 0.35 }
+        { rootMargin: '-30% 0px -55% 0px', threshold: 0.01 }
       );
 
       observer.observe(element);
@@ -45,32 +46,50 @@ export default function FloatingNav({ items }: FloatingNavProps) {
 
   return (
     <motion.nav
-      initial={{ y: -20, opacity: 0 }}
-      animate={isVisible ? { y: 0, opacity: 1 } : {}}
-      className="fixed left-1/2 top-5 z-50 w-[calc(100%-1.5rem)] max-w-4xl -translate-x-1/2 rounded-2xl border border-white/10 bg-[#0e1813]/85 px-3 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.28)] backdrop-blur"
+      aria-label="Primary navigation"
+      initial={{ opacity: 0 }}
+      animate={isVisible ? { opacity: 1 } : {}}
+      className="fixed left-4 right-4 top-4 z-50 mx-auto max-w-6xl rounded-[18px] border border-[var(--line)] bg-[rgba(255,250,242,0.84)] px-3 py-3 shadow-[var(--shadow-soft)] backdrop-blur-xl"
     >
-      <ul className="flex flex-wrap items-center justify-center gap-2">
-        {items.map((item) => (
-          <li key={item.id} className="relative">
-            <button
-              onMouseDown={(event) => event.preventDefault()}
-              onClick={() => scrollToSection(item.id)}
-              className={`relative z-10 rounded-xl px-4 py-2 text-sm transition ${
-                activeSection === item.id ? 'text-emerald-950' : 'text-zinc-300 hover:text-white'
-              }`}
-            >
-              {item.label}
-            </button>
-            {activeSection === item.id && (
-              <motion.div
-                layoutId="nav-active-pill"
-                className="absolute inset-0 rounded-xl bg-emerald-300"
-                transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-              />
-            )}
-          </li>
-        ))}
-      </ul>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <button
+          type="button"
+          onClick={() => scrollToSection('home')}
+          className="flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-left transition hover:bg-[rgba(23,19,15,0.05)]"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[var(--ink)] text-sm font-black text-[var(--surface)]">
+            V
+          </span>
+          <span>
+            <span className="block text-sm font-black text-[var(--ink)]">{brandName}</span>
+            <span className="block text-xs text-[var(--muted)]">Roblox systems</span>
+          </span>
+        </button>
+
+        <ul className="flex items-center gap-1 overflow-x-auto pb-1 md:flex-wrap md:justify-end md:overflow-visible md:pb-0">
+          {items.map((item) => (
+            <li key={item.id} className="relative shrink-0">
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => scrollToSection(item.id)}
+                className={`relative z-10 min-h-10 rounded-[10px] px-3 text-sm font-semibold transition ${
+                  activeSection === item.id ? 'text-[var(--surface)]' : 'text-[var(--muted)] hover:text-[var(--ink)]'
+                }`}
+              >
+                {item.label}
+              </button>
+              {activeSection === item.id && (
+                <motion.div
+                  layoutId="nav-active-pill"
+                  className="absolute inset-0 rounded-[10px] bg-[var(--accent)]"
+                  transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+                />
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </motion.nav>
   );
 }

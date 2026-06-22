@@ -4,19 +4,47 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
+    color-scheme: light;
+    --bg: #f7f3ec;
+    --surface: #fffaf2;
+    --surface-2: #ebe1d4;
+    --ink: #17130f;
+    --muted: #6d6257;
+    --soft: #a49484;
+    --line: rgba(40, 31, 24, 0.14);
+    --accent: #bf4d2a;
+    --accent-2: #256f68;
+    --accent-3: #e7b35a;
+    --danger: #b42318;
+    --warning: #b7791f;
+    --success: #21725f;
+    --info: #2867a7;
+    --shadow: 0 24px 70px rgba(55, 38, 25, 0.14);
+    --shadow-soft: 0 14px 35px rgba(55, 38, 25, 0.1);
+    --radius: 8px;
+    --radius-lg: 18px;
+    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
   html {
+    overflow-x: hidden;
     scroll-behavior: smooth;
   }
 
   body {
     margin: 0;
     min-width: 320px;
-    background: #07110c;
-    color: #f4f4f5;
+    background:
+      linear-gradient(90deg, rgba(23, 19, 15, 0.035) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(23, 19, 15, 0.035) 1px, transparent 1px),
+      radial-gradient(circle at 18% 8%, rgba(191, 77, 42, 0.13), transparent 26rem),
+      radial-gradient(circle at 86% 18%, rgba(37, 111, 104, 0.13), transparent 24rem),
+      var(--bg);
+    background-size: 44px 44px, 44px 44px, auto, auto, auto;
+    color: var(--ink);
     font-family: "Segoe UI", Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
   }
 
   * {
@@ -26,5 +54,156 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  ::selection {
+    background: rgba(191, 77, 42, 0.22);
+  }
+
+  :focus-visible {
+    outline: 3px solid rgba(191, 77, 42, 0.38);
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  .section-kicker {
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    color: var(--ink);
+    font-size: clamp(2rem, 4vw, 4.4rem);
+    font-weight: 750;
+    line-height: 0.98;
+  }
+
+  .section-copy {
+    color: var(--muted);
+    font-size: 1.03rem;
+    line-height: 1.85;
+  }
+
+  .paper-panel {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--surface) 88%, white 12%);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .ink-button {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: var(--surface);
+    font-weight: 750;
+    transition: transform 180ms var(--ease-out), background 180ms var(--ease-out);
+  }
+
+  .ink-button:hover {
+    background: #2b2119;
+    transform: translateY(-1px);
+  }
+
+  .line-button {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(255, 250, 242, 0.64);
+    color: var(--ink);
+    font-weight: 700;
+    transition: border-color 180ms var(--ease-out), transform 180ms var(--ease-out), background 180ms var(--ease-out);
+  }
+
+  .line-button:hover {
+    border-color: rgba(191, 77, 42, 0.45);
+    background: var(--surface);
+    transform: translateY(-1px);
+  }
+
+  .human-card {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(135deg, rgba(255, 250, 242, 0.94), rgba(247, 239, 226, 0.9)),
+      var(--surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .human-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background-image:
+      linear-gradient(90deg, rgba(23, 19, 15, 0.035) 1px, transparent 1px),
+      linear-gradient(180deg, rgba(23, 19, 15, 0.035) 1px, transparent 1px);
+    background-size: 18px 18px;
+    mask-image: linear-gradient(180deg, black, transparent 72%);
+  }
+
+  .signal-chip {
+    border: 1px solid rgba(23, 19, 15, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 250, 242, 0.76);
+    color: var(--muted);
+  }
+
+  .signal-line {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .signal-line::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3));
+    transform: scaleX(0.34);
+    transform-origin: left;
+    animation: signalSweep 5.5s var(--ease-out) infinite;
+  }
+
+  @keyframes signalSweep {
+    0%,
+    100% {
+      transform: translateX(-8%) scaleX(0.34);
+      opacity: 0.62;
+    }
+
+    50% {
+      transform: translateX(74%) scaleX(0.22);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.001ms !important;
+    }
   }
 }

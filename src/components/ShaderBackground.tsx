@@ -137,7 +137,7 @@ export default function ShaderBackground() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    let startTime = Date.now();
+    const startTime = Date.now();
     const render = () => {
       const time = (Date.now() - startTime) * 0.001;
       gl.uniform2f(uResolution, canvas.width, canvas.height);
