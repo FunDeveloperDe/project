@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 import type { SiteNavItem } from '../siteConfig';
 
 interface FloatingNavProps {
@@ -9,87 +10,76 @@ interface FloatingNavProps {
 
 export default function FloatingNav({ brandName, items }: FloatingNavProps) {
   const [activeSection, setActiveSection] = useState('home');
-  const [isVisible, setIsVisible] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navItems = useMemo(
+    () => items.filter((item) => ['home', 'work', 'services', 'about', 'contact'].includes(item.id)),
+    [items]
+  );
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIsVisible(true), 180);
-
-    const observers = items.map((item) => {
+    const observers = navItems.map((item) => {
       const element = document.getElementById(item.id);
-      if (!element) {
-        return null;
-      }
+      if (!element) return null;
 
       const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setActiveSection(item.id);
-          }
-        },
-        { rootMargin: '-30% 0px -55% 0px', threshold: 0.01 }
+        ([entry]) => entry.isIntersecting && setActiveSection(item.id),
+        { rootMargin: '-35% 0px -58% 0px', threshold: 0.01 }
       );
-
       observer.observe(element);
       return observer;
     });
 
-    return () => {
-      window.clearTimeout(timer);
-      observers.forEach((observer) => observer?.disconnect());
-    };
-  }, [items]);
+    return () => observers.forEach((observer) => observer?.disconnect());
+  }, [navItems]);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  useEffect(() => {
+    document.body.classList.toggle('menu-is-open', menuOpen);
+    return () => document.body.classList.remove('menu-is-open');
+  }, [menuOpen]);
 
   return (
-    <motion.nav
-      aria-label="Primary navigation"
-      initial={{ opacity: 0 }}
-      animate={isVisible ? { opacity: 1 } : {}}
-      className="fixed left-4 right-4 top-4 z-50 mx-auto max-w-6xl rounded-[18px] border border-[var(--line)] bg-[rgba(255,250,242,0.84)] px-3 py-3 shadow-[var(--shadow-soft)] backdrop-blur-xl"
-    >
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <button
-          type="button"
-          onClick={() => scrollToSection('home')}
-          className="flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-left transition hover:bg-[rgba(23,19,15,0.05)]"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[var(--ink)] text-sm font-black text-[var(--surface)]">
-            V
-          </span>
-          <span>
-            <span className="block text-sm font-black text-[var(--ink)]">{brandName}</span>
-            <span className="block text-xs text-[var(--muted)]">Roblox systems</span>
-          </span>
-        </button>
+    <header className="site-header">
+      <a className="brand-lockup" href="#home" onClick={() => setMenuOpen(false)}>
+        <span className="brand-mark">V/</span>
+        <span>{brandName}<small>Systems developer</small></span>
+      </a>
 
-        <ul className="flex items-center gap-1 overflow-x-auto pb-1 md:flex-wrap md:justify-end md:overflow-visible md:pb-0">
-          {items.map((item) => (
-            <li key={item.id} className="relative shrink-0">
-              <button
-                type="button"
-                onMouseDown={(event) => event.preventDefault()}
-                onClick={() => scrollToSection(item.id)}
-                className={`relative z-10 min-h-10 rounded-[10px] px-3 text-sm font-semibold transition ${
-                  activeSection === item.id ? 'text-[var(--surface)]' : 'text-[var(--muted)] hover:text-[var(--ink)]'
-                }`}
-              >
-                {item.label}
-              </button>
-              {activeSection === item.id && (
-                <motion.div
-                  layoutId="nav-active-pill"
-                  className="absolute inset-0 rounded-[10px] bg-[var(--accent)]"
-                  transition={{ type: 'spring', stiffness: 340, damping: 30 }}
-                />
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </motion.nav>
+      <nav className="desktop-nav" aria-label="Primary navigation">
+        {navItems.map((item) => (
+          <a key={item.id} href={`#${item.id}`} className={activeSection === item.id ? 'active' : ''}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+
+      <button
+        className="menu-toggle"
+        type="button"
+        onClick={() => setMenuOpen((current) => !current)}
+        aria-expanded={menuOpen}
+        aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
+      >
+        {menuOpen ? <X size={22} /> : <Menu size={22} />}
+      </button>
+
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.nav
+            className="mobile-nav"
+            aria-label="Mobile navigation"
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+          >
+            {navItems.map((item, index) => (
+              <a key={item.id} href={`#${item.id}`} onClick={() => setMenuOpen(false)}>
+                <span>0{index + 1}</span>{item.label}
+              </a>
+            ))}
+          </motion.nav>
+        )}
+      </AnimatePresence>
+    </header>
   );
 }

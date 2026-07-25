@@ -2,7 +2,7 @@ window.__SITE_CONFIG__ = {
   meta: {
     title: 'Vantyx | Roblox Systems Developer',
     description: 'Roblox systems portfolio for Vantyx, focused on scalable backend logic, secure gameplay systems, movement, combat, AI, and production-ready game architecture.',
-    image: 'https://placehold.co/1200x630/png',
+    image: 'https://i.ytimg.com/vi/PsKBOt1Od14/maxresdefault.jpg',
     url: 'https://fundeveloperde.github.io/project/',
   },
   brand: {
@@ -180,7 +180,7 @@ window.__SITE_CONFIG__ = {
     eyebrow: 'Quick panel',
     title: 'A small interactive systems panel',
     intro:
-      'Use the commands to skim the portfolio quickly, or trigger a few visual tests if you want the page to show off a little.',
+      'Use the commands to skim the systems, backend approach, gameplay focus, stack, and contact details without leaving the page.',
     initialMessage: 'Panel ready. Type "help" to explore available commands.',
     commands: {
       help: [
