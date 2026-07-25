@@ -21,6 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -38,6 +42,17 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify deploy artifact
+        shell: bash
+        run: |
+          test -f dist/index.html
+          test -f dist/site-config.js
+          grep -q './assets/' dist/index.html
+          if grep -q '/src/main.tsx' dist/index.html; then
+            echo 'dist/index.html still references the Vite development entrypoint.' >&2
+            exit 1
+          fi
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
