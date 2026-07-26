@@ -27,10 +27,16 @@ export interface SiteConfig {
   navigation: SiteNavItem[];
   hero: {
     eyebrow: string;
+    headline: [string, string];
+    videoId: string;
     title: string;
     description: string;
     primaryCta: string;
     secondaryCta: string;
+    stats: Array<{
+      value: string;
+      label: string;
+    }>;
     availabilityLabel: string;
     availability: string;
   };
@@ -138,11 +144,18 @@ export const defaultSiteConfig: SiteConfig = {
   ],
   hero: {
     eyebrow: 'Roblox programmer',
-    title: 'Gameplay systems, backend code, and tools for Roblox.',
+    headline: ['Roblox', 'Development'],
+    videoId: 'bzXzGMbdQfY',
+    title: 'Gameplay systems, backend code, and tools.',
     description:
       'Movement, combat, persistent data, server architecture, admin tooling, UI, and performance - built and tested in Roblox Studio.',
     primaryCta: 'View projects',
     secondaryCta: 'Discord',
+    stats: [
+      { value: '3.5 yrs', label: 'Experience' },
+      { value: '$25', label: 'Minimum project' },
+      { value: '100+', label: 'Clients' },
+    ],
     availabilityLabel: 'Commissions',
     availability:
       'Open for commissions across full games, standalone systems, bug fixes, and optimization work.',

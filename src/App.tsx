@@ -8,6 +8,7 @@ import {
   Check,
   ChevronRight,
   Copy,
+  Pause,
   Play,
   ShieldCheck,
   Terminal,
@@ -15,6 +16,7 @@ import {
 import FloatingNav from './components/FloatingNav';
 import InteractiveTerminal from './components/InteractiveTerminal';
 import { siteConfig, type SiteProject } from './siteConfig';
+import robloxWordmark from './assets/roblox-wordmark-white.svg';
 
 function getYoutubeId(url: string) {
   return url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&/]+)/)?.[1] ?? '';
@@ -75,10 +77,14 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
 function App() {
   const [activeService, setActiveService] = useState(0);
   const [copied, setCopied] = useState('');
+  const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
-  const featuredProject = siteConfig.projects.items[0];
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
+
+  useEffect(() => {
+    if (reduceMotion) setHeroVideoPlaying(false);
+  }, [reduceMotion]);
 
   useEffect(() => {
     document.title = siteConfig.meta.title;
@@ -131,10 +137,35 @@ function App() {
       <main>
         <section id="home" className="hero-section">
           <div className="hero-media">
-            <img src={projectImage(featuredProject)} alt={`Gameplay frame from ${featuredProject.title}`} />
+            <img
+              src={`https://i.ytimg.com/vi/${siteConfig.hero.videoId}/maxresdefault.jpg`}
+              alt="Animated Roblox characters from the Roblox Anthem video"
+            />
+            {!reduceMotion && heroVideoPlaying && (
+              <iframe
+                src={`https://www.youtube.com/embed/${siteConfig.hero.videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${siteConfig.hero.videoId}&playsinline=1&rel=0&modestbranding=1&disablekb=1`}
+                title="Roblox Anthem background video"
+                tabIndex={-1}
+                aria-hidden="true"
+                allow="autoplay; encrypted-media"
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            )}
           </div>
           <div className="hero-overlay" aria-hidden="true" />
           <div className="hero-rule" aria-hidden="true" />
+
+          {!reduceMotion && (
+            <button
+              className="hero-video-toggle"
+              type="button"
+              onClick={() => setHeroVideoPlaying((playing) => !playing)}
+              aria-label={heroVideoPlaying ? 'Pause background video' : 'Play background video'}
+              title={heroVideoPlaying ? 'Pause background video' : 'Play background video'}
+            >
+              {heroVideoPlaying ? <Pause size={16} /> : <Play size={16} fill="currentColor" />}
+            </button>
+          )}
 
           <div className="hero-content page-grid">
             <motion.div
@@ -144,9 +175,21 @@ function App() {
               transition={{ duration: 0.76, ease: [0.16, 1, 0.3, 1] }}
             >
               <p className="eyebrow light"><Braces size={15} />{siteConfig.hero.eyebrow}</p>
-              <h1>{siteConfig.brand.name}</h1>
+              <h1>
+                <img className="roblox-wordmark" src={robloxWordmark} alt={siteConfig.hero.headline[0]} />
+                <strong>{siteConfig.hero.headline[1]}</strong>
+              </h1>
               <p className="hero-title"><TypingText text={siteConfig.hero.title} disabled={Boolean(reduceMotion)} /></p>
               <p className="hero-description">{siteConfig.hero.description}</p>
+              <div className="hero-stats" aria-label="Experience, pricing, and client count">
+                {siteConfig.hero.stats.map((stat, index) => (
+                  <div key={stat.label} className="hero-stat">
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <strong>{stat.value}</strong>
+                    <small>{stat.label}</small>
+                  </div>
+                ))}
+              </div>
               <div className="hero-actions">
                 <a className="button button-primary" href="#work">
                   {siteConfig.hero.primaryCta}<ArrowDown size={18} />
@@ -157,26 +200,6 @@ function App() {
               </div>
             </motion.div>
 
-            <motion.aside
-              className="hero-project"
-              initial={reduceMotion ? false : { opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.68, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-              aria-label="Featured project"
-            >
-              <p>Start here</p>
-              <h2>{featuredProject.title}</h2>
-              <span>{featuredProject.category}</span>
-              <a href={featuredProject.videoUrl} target="_blank" rel="noreferrer">
-                Watch the video<Play size={17} fill="currentColor" />
-              </a>
-            </motion.aside>
-
-            <div className="hero-meta" aria-label="Portfolio summary">
-              <span><b>{String(siteConfig.projects.items.length).padStart(2, '0')}</b>Project videos</span>
-              <span><b>Luau</b>Main language</span>
-              <span><b>Server</b>Important logic</span>
-            </div>
           </div>
         </section>
 

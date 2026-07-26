@@ -25,11 +25,18 @@ window.__SITE_CONFIG__ = {
   ],
   hero: {
     eyebrow: 'Roblox programmer',
-    title: 'Gameplay systems, backend code, and tools for Roblox.',
+    headline: ['Roblox', 'Development'],
+    videoId: 'bzXzGMbdQfY',
+    title: 'Gameplay systems, backend code, and tools.',
     description:
       'Movement, combat, persistent data, server architecture, admin tooling, UI, and performance - built and tested in Roblox Studio.',
     primaryCta: 'View projects',
     secondaryCta: 'Discord',
+    stats: [
+      { value: '3.5 yrs', label: 'Experience' },
+      { value: '$25', label: 'Minimum project' },
+      { value: '100+', label: 'Clients' },
+    ],
     availabilityLabel: 'Commissions',
     availability:
       'Open for commissions across full games, standalone systems, bug fixes, and optimization work.',
