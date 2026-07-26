@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build && node -e \"require('fs').copyFileSync('site-config.js','dist/site-config.js')\"",
+    "build:pages": "vite build --outDir docs && node -e \"require('fs').copyFileSync('site-config.js','docs/site-config.js')\"",
     "preview": "vite preview --host 127.0.0.1",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
