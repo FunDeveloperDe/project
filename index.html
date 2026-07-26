@@ -9,18 +9,19 @@
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://fundeveloperde.github.io/project/" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>
-      if (window.location.hostname.endsWith('.github.io') && !window.location.pathname.endsWith('/docs/')) {
-        const productionUrl = new URL('./docs/', window.location.href);
-        productionUrl.hash = window.location.hash;
-        window.location.replace(productionUrl);
-      }
-    </script>
     <script src="./site-config.js"></script>
     <title>Vantyx | Roblox Systems Developer</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      const developmentEntry = document.querySelector('script[src="/src/main.tsx"]');
+      if (developmentEntry && window.location.hostname.endsWith('.github.io')) {
+        const productionUrl = new URL('./docs/', window.location.href);
+        productionUrl.hash = window.location.hash;
+        window.location.replace(productionUrl);
+      }
+    </script>
   </body>
 </html>
