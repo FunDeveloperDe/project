@@ -26,6 +26,11 @@ function projectImage(project: SiteProject) {
   return `https://i.ytimg.com/vi/${getYoutubeId(project.videoUrl)}/maxresdefault.jpg`;
 }
 
+function projectEmbedUrl(project: SiteProject) {
+  const videoId = getYoutubeId(project.videoUrl);
+  return `https://www.youtube-nocookie.com/embed/${videoId}?playsinline=1&rel=0&modestbranding=1`;
+}
+
 const serviceProjectIndexes = [2, 0, 2, 2, 1];
 
 const reveal = {
@@ -231,17 +236,16 @@ function App() {
                 transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="project-index">P/{String(index + 1).padStart(2, '0')}</div>
-                <a
-                  className="project-media"
-                  href={project.videoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={`Watch ${project.title} on YouTube`}
-                >
-                  <img src={projectImage(project)} alt={`Gameplay preview for ${project.title}`} loading="lazy" />
-                  <span className="media-corner" aria-hidden="true" />
-                  <span className="project-watch"><Play size={17} fill="currentColor" />Watch video</span>
-                </a>
+                <div className="project-media">
+                  <iframe
+                    src={projectEmbedUrl(project)}
+                    title={`${project.title} video`}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                </div>
                 <div className="project-copy">
                   <p className="eyebrow">{project.category}</p>
                   <h3>{project.title}</h3>
@@ -250,9 +254,6 @@ function App() {
                   <ul className="project-stack" aria-label={`${project.title} technologies`}>
                     {project.stack.map((item) => <li key={item}>{item}</li>)}
                   </ul>
-                  <a className="text-link" href={project.videoUrl} target="_blank" rel="noreferrer">
-                    View project video<ArrowUpRight size={17} />
-                  </a>
                 </div>
               </motion.article>
             ))}
@@ -270,24 +271,22 @@ function App() {
           </div>
 
           <div className="systems-workbench page-grid">
-            <motion.a
+            <motion.div
               key={relatedServiceProject.title}
               className="systems-media"
-              href={relatedServiceProject.videoUrl}
-              target="_blank"
-              rel="noreferrer"
               initial={reduceMotion ? false : { opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.32 }}
-              aria-label={`Watch related project: ${relatedServiceProject.title}`}
             >
-              <img src={projectImage(relatedServiceProject)} alt={`Related gameplay project: ${relatedServiceProject.title}`} />
-              <span className="systems-media-caption">
-                <small>Example project</small>
-                <strong>{relatedServiceProject.title}</strong>
-                <span>Watch video<ArrowUpRight size={15} /></span>
-              </span>
-            </motion.a>
+              <iframe
+                src={projectEmbedUrl(relatedServiceProject)}
+                title={`${relatedServiceProject.title} video`}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            </motion.div>
 
             <div className="systems-panel">
               <motion.div

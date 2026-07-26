@@ -154,7 +154,7 @@ export const defaultSiteConfig: SiteConfig = {
     stats: [
       { value: '3.5 yrs', label: 'Experience' },
       { value: '$25', label: 'Minimum project' },
-      { value: '100+', label: 'Clients' },
+      { value: '95+', label: 'Clients' },
     ],
     availabilityLabel: 'Commissions',
     availability:
