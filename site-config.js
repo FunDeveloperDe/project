@@ -1,7 +1,7 @@
 window.__SITE_CONFIG__ = {
   meta: {
     title: 'Vantyx | Roblox Systems Developer',
-    description: 'Roblox systems portfolio for Vantyx, focused on scalable backend logic, secure gameplay systems, movement, combat, AI, and production-ready game architecture.',
+    description: 'Portfolio of Vantyx, a Roblox programmer focused on gameplay systems, server code, persistent data, tools, and performance.',
     image: 'https://i.ytimg.com/vi/PsKBOt1Od14/maxresdefault.jpg',
     url: 'https://fundeveloperde.github.io/project/',
   },
@@ -9,86 +9,86 @@ window.__SITE_CONFIG__ = {
     name: 'Vantyx',
     badge: 'Roblox systems developer',
     taglinePhrases: [
-      'Server-authoritative systems',
-      'Responsive gameplay mechanics',
-      'Production-minded architecture',
+      'Roblox gameplay programming',
+      'Backend and data systems',
+      'Tools built in Luau',
     ],
   },
   navigation: [
     { id: 'home', label: 'Home' },
-    { id: 'services', label: 'Systems' },
+    { id: 'services', label: 'Services' },
     { id: 'work', label: 'Projects' },
     { id: 'skills', label: 'Stack' },
     { id: 'about', label: 'About' },
-    { id: 'terminal', label: 'Panel' },
+    { id: 'terminal', label: 'Console' },
     { id: 'contact', label: 'Contact' },
   ],
   hero: {
-    eyebrow: 'Roblox scripting and system design',
-    title: 'I build Roblox systems that feel smooth to play and sane to maintain.',
+    eyebrow: 'Roblox programmer',
+    title: 'Gameplay systems, backend code, and tools for Roblox.',
     description:
-      'I focus on backend logic, gameplay mechanics, optimization, and modular frameworks for Roblox experiences that need to scale without turning into fragile scripts.',
-    primaryCta: 'Watch the work',
-    secondaryCta: 'Message me',
-    availabilityLabel: 'Current focus',
+      'Movement, combat, persistent data, server architecture, admin tooling, UI, and performance - built and tested in Roblox Studio.',
+    primaryCta: 'View projects',
+    secondaryCta: 'Discord',
+    availabilityLabel: 'Commissions',
     availability:
-      'Full Roblox experiences, standalone gameplay systems, backend services, secure remotes, and performance cleanup.',
+      'Open for commissions across full games, standalone systems, bug fixes, and optimization work.',
   },
   about: {
-    eyebrow: 'About',
-    title: 'Clean systems, sharp gameplay, fewer surprises after launch',
+    eyebrow: 'Approach',
+    title: 'Gameplay feel and server reliability, treated as one problem',
     paragraphs: [
-      'Vantyx builds Roblox systems with a strong bias toward server authority, clear module boundaries, and code that can survive real players. The goal is simple: mechanics should feel good, data should stay safe, and future changes should not be painful.',
-      'Recent work includes DataStore pipelines, MemoryStore systems, cross-server control, procedural worlds, combat, movement, vehicles, quests, inventories, NPC AI, building systems, UI flows, anti-cheat validation, and full game loops.',
+      'Work spans both sides of a Roblox experience: movement, combat, vehicles, NPCs, inventories, quests, procedural generation, and UI on the player side; DataStore, MemoryStore, cross-server messaging, and web integrations on the server side.',
+      'Important state remains server-authoritative. Remote input is validated, performance is profiled, and large features are divided into focused modules that can be extended without rewriting the entire game.',
     ],
     highlights: [
-      'Server authority',
-      'Exploit-resistant remotes',
-      'Modular codebases',
-      'Performance profiling',
-      'Expandable systems',
+      'Important logic stays on the server',
+      'Remote input gets checked',
+      'Code is split into useful modules',
+      'Slow code gets profiled',
+      'Systems can be changed later',
     ],
     highlightValueLabel: 'Ready',
   },
   services: {
-    eyebrow: 'What I build',
-    title: 'Systems that hold up when players start pushing them',
+    eyebrow: 'Development scope',
+    title: 'Roblox development across gameplay and backend',
     items: [
       {
         title: 'Backend and data',
         description:
-          'DataStore pipelines, MemoryStore queues, economies, cross-server messaging, web integrations, and secure server-client architecture.',
+          'Persistent player data, inventories, currencies, MemoryStore queues, cross-server messaging, and web APIs. Important state remains server-controlled.',
       },
       {
         title: 'Gameplay systems',
         description:
-          'Movement, combat, abilities, vehicles, building, inventory, quests, NPC AI, and complete gameplay loops built around responsive feel.',
+          'Movement, combat, abilities, vehicles, building, quests, NPCs, and complete gameplay loops, with attention to input response and readable feedback.',
       },
       {
-        title: 'Multiplayer infrastructure',
+        title: 'Multiplayer and servers',
         description:
-          'Party systems, matchmaking, round flow, server synchronization, admin tooling, and live coordination across active servers.',
+          'Parties, matchmaking, round flow, server synchronization, and admin tooling, with authoritative state shared cleanly across clients.',
       },
       {
         title: 'Security and optimization',
         description:
-          'Remote validation, anti-cheat checks, exploit prevention, performance cleanup, and refactors that make large systems easier to reason about.',
+          'Remote validation, exploit-resistant game logic, performance profiling, and refactoring for systems that have become difficult to maintain.',
       },
       {
         title: 'Frontend and UI',
         description:
-          'Modular Roblox UI systems for shops, feedback, dashboards, inventories, and player-facing flows that stay connected to backend logic.',
+          'Shops, inventories, HUDs, dashboards, and player feedback connected directly to server-backed game state.',
       },
     ],
   },
   skills: {
-    eyebrow: 'Stack and specialties',
-    title: 'The practical parts I reach for most',
+    eyebrow: 'Core stack',
+    title: 'Tools and specialties',
     groups: [
       {
         category: 'Systems',
         items: [
-          'Backend architecture',
+          'Server and data code',
           'Gameplay mechanics',
           'Procedural generation',
           'Cross-server control',
@@ -112,25 +112,25 @@ window.__SITE_CONFIG__ = {
           'DataStore',
           'MemoryStore',
           'HTTPService',
-          'Modular frameworks',
+          'Reusable ModuleScripts',
         ],
       },
     ],
   },
   projects: {
-    eyebrow: 'Featured work',
-    title: 'A few systems from the lab',
+    eyebrow: 'Selected projects',
+    title: 'Five working Roblox systems',
     intro:
-      'Each project shows a different side of the work: traversal feel, secure admin tooling, procedural content, rendering experiments, and first-person responsiveness.',
+      'Traversal, first-person combat, live administration, procedural terrain, and raycast rendering. Every project includes a video of the system running in Roblox Studio.',
     previewLabel: 'Video',
     items: [
       {
         title: 'Spider-Man Movement System',
         category: 'Traversal system',
         description:
-          'A physics-based traversal system with web swinging, wall running, surface climbing, dynamic camera tilt, and motion feedback.',
+          'Physics-based traversal controller combining web swinging, wall running, surface climbing, camera tilt, and movement feedback.',
         outcome:
-          'Built for responsive high-speed movement with stable transitions between swinging, sprinting, climbing, and wall running.',
+          'Momentum carries between swinging, sprinting, climbing, and wall running without abrupt state changes.',
         stack: ['Roblox Luau', 'Physics', 'Raycasting', 'Camera systems', 'Input handling'],
         videoUrl: 'https://youtu.be/PsKBOt1Od14',
       },
@@ -138,9 +138,9 @@ window.__SITE_CONFIG__ = {
         title: 'FPS Pistol System',
         category: 'First-person combat',
         description:
-          'A viewmodel-based pistol system with responsive firing, synchronized animation, camera handling, and accurate raycast hit detection.',
+          'Viewmodel-based pistol system with synchronized animation, camera motion, responsive firing, and raycast hit detection.',
         outcome:
-          'Designed to make first-person gunplay feel fast and readable while keeping hit logic predictable.',
+          'Input, animation, camera feedback, and hit logic remain synchronized through each shot.',
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Camera control', 'Input handling'],
         videoUrl: 'https://youtu.be/V3xgPGcSTic',
       },
@@ -148,9 +148,9 @@ window.__SITE_CONFIG__ = {
         title: 'Web-Based Game Administration',
         category: 'Live operations',
         description:
-          'A web-to-game administration system that lets authorized admins manage live Roblox servers from an external interface.',
+          'External administration interface connected to active Roblox servers through authenticated web requests.',
         outcome:
-          'Built around centralized control, authentication, real-time command execution, and cross-server synchronization.',
+          'Authorized commands route to the correct servers and synchronize across the live game.',
         stack: ['Roblox Luau', 'HTTPService', 'Web API', 'Cross-server messaging', 'Authentication'],
         videoUrl: 'https://youtu.be/zKCMLSKQytY',
       },
@@ -158,9 +158,9 @@ window.__SITE_CONFIG__ = {
         title: 'Procedural Terrain Generation',
         category: 'World generation',
         description:
-          'A chunk-based terrain system that generates biome-specific environments, trees, structures, and scattered objects.',
+          'Chunk-based world generator for biome terrain, trees, structures, and environmental detail.',
         outcome:
-          'Built for scalable world generation with consistent biome distribution, dynamic variation, and performance-conscious loading.',
+          'Chunks generate on demand to limit unnecessary work while preserving biome variation.',
         stack: ['Roblox Luau', 'Procedural generation', 'Noise', 'Chunk loading', 'Asset spawning'],
         videoUrl: 'https://youtu.be/rTRbfrchyrE',
       },
@@ -168,29 +168,29 @@ window.__SITE_CONFIG__ = {
         title: 'Raycast Rendering System',
         category: 'Rendering experiment',
         description:
-          'A custom renderer that uses raycasts to project scene information inside Roblox and react to surfaces, geometry, and lighting.',
+          'Custom renderer that samples Roblox scenes with raycasts and draws the result inside the game.',
         outcome:
-          'Built as a real-time visual simulation driven by ray-based calculations and environmental lighting.',
+          'Geometry, surface data, and lighting influence the image in real time.',
         stack: ['Roblox Luau', 'Raycasting', 'Rendering logic', 'Lighting simulation', 'Optimization'],
         videoUrl: 'https://youtu.be/JkfpLhObRBQ',
       },
     ],
   },
   terminal: {
-    eyebrow: 'Quick panel',
-    title: 'A small interactive systems panel',
+    eyebrow: 'Project console',
+    title: 'Technical overview',
     intro:
-      'Use the commands to skim the systems, backend approach, gameplay focus, stack, and contact details without leaving the page.',
-    initialMessage: 'Panel ready. Type "help" to explore available commands.',
+      'Use the commands below for a compact summary of development scope, backend work, gameplay systems, tools, and contact details.',
+    initialMessage: 'Console ready. Type "help" to see the commands.',
     commands: {
       help: [
         'Available commands:',
         '  help      Show the command list',
-        '  systems   View core systems and mechanics',
-        '  backend   Learn about backend and infrastructure',
-        '  gameplay  Explore gameplay systems',
-        '  stack     View technologies and tools',
-        '  contact   Get contact information',
+        '  systems   List development scope',
+        '  backend   Show backend capabilities',
+        '  gameplay  Show gameplay capabilities',
+        '  stack     Show tools and APIs',
+        '  contact   Show Discord',
         '  confetti  Launch a confetti burst',
         '  fireworks Launch animated fireworks',
         '  matrix    Start a code rain effect',
@@ -199,16 +199,16 @@ window.__SITE_CONFIG__ = {
         '  clear     Reset the panel',
       ],
       systems: [
-        'Movement, FPS mechanics, procedural generation, vehicles, AI, inventory, quests, combat, UI flows, and admin systems.',
+        'Movement, weapons, procedural worlds, vehicles, AI, inventories, quests, combat, UI, and administration tools.',
       ],
       backend: [
-        'DataStore, MemoryStore, cross-server messaging, HTTPService, authenticated web commands, secure remotes, and validation-first design.',
+        'DataStore, MemoryStore, cross-server messaging, HTTPService, authenticated web commands, and server-side remote validation.',
       ],
       gameplay: [
-        'Responsive mechanics built around player feel, server authority, readable feedback, and systems that remain expandable.',
+        'Responsive controls and readable feedback on the client, with important game state controlled by the server.',
       ],
       stack: [
-        'Roblox Luau, DataStore, MemoryStore, HTTPService, raycasting, physics, procedural generation, camera systems, and modular architecture.',
+        'Roblox Luau, DataStore, MemoryStore, HTTPService, raycasting, physics, procedural generation, camera systems, and reusable modules.',
       ],
       contact: [
         'Discord: vantyx_999',
@@ -216,12 +216,12 @@ window.__SITE_CONFIG__ = {
     },
     quickCommands: ['help', 'systems', 'backend', 'gameplay', 'stack', 'contact', 'matrix', 'glitch', 'blackhole'],
     visualCommands: ['confetti', 'fireworks', 'matrix', 'glitch', 'blackhole'],
-    panelLabel: 'Systems panel',
-    panelDescription: 'Shortcuts, project notes, and visual commands',
-    visualsEnabledLabel: 'Visual tests enabled',
-    feedLabel: 'Feed',
-    promptLabel: 'Command',
-    processingLabel: 'Processing...',
+    panelLabel: 'Vantyx console',
+    panelDescription: 'Development scope and project notes',
+    visualsEnabledLabel: 'Effects on',
+    feedLabel: 'Output',
+    promptLabel: 'Type a command',
+    processingLabel: 'Running...',
     inputPlaceholder: 'Try "systems", "backend", or "matrix"',
     unknownCommandPrefix: 'Unknown command:',
     visualResponses: {
@@ -233,23 +233,23 @@ window.__SITE_CONFIG__ = {
     },
   },
   contact: {
-    eyebrow: 'Contact',
-    title: 'Send me the system you want built',
+    eyebrow: 'Commissions',
+    title: 'Discuss a Roblox project',
     description:
-      'Fastest path is Discord. Share the mechanic, the current code state, and what should feel better in-game.',
+      'Send the game concept, current build state, required system, and expected scope on Discord.',
     methods: [{ label: 'Discord', value: 'vantyx_999' }],
   },
   footer: {
     left: 'Vantyx',
-    right: 'Roblox systems, gameplay, and backend architecture.',
+    right: 'Roblox programmer. Gameplay, backend, and tools.',
   },
   boot: {
-    label: 'Preparing the workspace',
+    label: 'Opening the portfolio',
     steps: [
-      'Loading project notes',
-      'Checking system showcases',
-      'Syncing backend context',
-      'Opening the portfolio',
+      'Loading project videos',
+      'Loading system notes',
+      'Checking page assets',
+      'Ready to view',
     ],
     loadingLabel: 'Loading',
     readyLabel: 'Ready',

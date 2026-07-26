@@ -12,24 +12,24 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
   const [activeSection, setActiveSection] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
   const navItems = useMemo(
-    () => items.filter((item) => ['home', 'work', 'services', 'about', 'contact'].includes(item.id)),
-    [items]
+    () => items.filter((item) => ['home', 'work', 'services', 'about', 'terminal', 'contact'].includes(item.id)),
+    [items],
   );
 
   useEffect(() => {
     const observers = navItems.map((item) => {
       const element = document.getElementById(item.id);
       if (!element) return null;
-
       const observer = new IntersectionObserver(
         ([entry]) => entry.isIntersecting && setActiveSection(item.id),
-        { rootMargin: '-35% 0px -58% 0px', threshold: 0.01 }
+        { rootMargin: '-34% 0px -58% 0px', threshold: 0.01 },
       );
       observer.observe(element);
       return observer;
     });
-
-    return () => observers.forEach((observer) => observer?.disconnect());
+    return () => {
+      for (const observer of observers) observer?.disconnect();
+    };
   }, [navItems]);
 
   useEffect(() => {
@@ -40,17 +40,19 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
   return (
     <header className="site-header">
       <a className="brand-lockup" href="#home" onClick={() => setMenuOpen(false)}>
-        <span className="brand-mark">V/</span>
-        <span>{brandName}<small>Systems developer</small></span>
+        <span className="brand-mark" aria-hidden="true">V</span>
+        <span><strong>{brandName}</strong><small>Roblox programmer / Luau</small></span>
       </a>
 
       <nav className="desktop-nav" aria-label="Primary navigation">
-        {navItems.map((item) => (
+        {navItems.map((item, index) => (
           <a key={item.id} href={`#${item.id}`} className={activeSection === item.id ? 'active' : ''}>
-            {item.label}
+            <span>0{index + 1}</span>{item.label}
           </a>
         ))}
       </nav>
+
+      <span className="header-status"><i />Status: accepting commissions</span>
 
       <button
         className="menu-toggle"
@@ -59,7 +61,7 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
         aria-expanded={menuOpen}
         aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
       >
-        {menuOpen ? <X size={22} /> : <Menu size={22} />}
+        {menuOpen ? <X size={21} /> : <Menu size={21} />}
       </button>
 
       <AnimatePresence>
@@ -67,14 +69,15 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
           <motion.nav
             className="mobile-nav"
             aria-label="Mobile navigation"
-            initial={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
+            <p className="mobile-nav-status"><i />Status: accepting commissions</p>
             {navItems.map((item, index) => (
               <a key={item.id} href={`#${item.id}`} onClick={() => setMenuOpen(false)}>
-                <span>0{index + 1}</span>{item.label}
+                <span>0{index + 1}</span>{item.label}<ArrowIndicator />
               </a>
             ))}
           </motion.nav>
@@ -82,4 +85,8 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
       </AnimatePresence>
     </header>
   );
+}
+
+function ArrowIndicator() {
+  return <span className="nav-arrow" aria-hidden="true">{"\u2197"}</span>;
 }
