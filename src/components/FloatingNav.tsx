@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { ArrowUpRight, Menu, X } from 'lucide-react';
 import type { SiteNavItem } from '../siteConfig';
 
 interface FloatingNavProps {
@@ -12,7 +12,7 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
   const [activeSection, setActiveSection] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
   const navItems = useMemo(
-    () => items.filter((item) => ['home', 'work', 'services', 'about', 'terminal', 'contact'].includes(item.id)),
+    () => items.filter((item) => ['home', 'work', 'services', 'about', 'contact'].includes(item.id)),
     [items],
   );
 
@@ -45,14 +45,18 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
       </a>
 
       <nav className="desktop-nav" aria-label="Primary navigation">
-        {navItems.map((item, index) => (
+        {navItems.map((item) => (
           <a key={item.id} href={`#${item.id}`} className={activeSection === item.id ? 'active' : ''}>
-            <span>0{index + 1}</span>{item.label}
+            {item.label}
           </a>
         ))}
       </nav>
 
-      <span className="header-status"><i />Status: accepting commissions</span>
+      <a className="header-status" href="#contact">
+        <i />
+        <span><small>Availability</small><strong>Open for commissions</strong></span>
+        <ArrowUpRight size={18} />
+      </a>
 
       <button
         className="menu-toggle"
@@ -74,10 +78,12 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
           >
-            <p className="mobile-nav-status"><i />Status: accepting commissions</p>
-            {navItems.map((item, index) => (
+            <a className="mobile-nav-status" href="#contact" onClick={() => setMenuOpen(false)}>
+              <i /><span><small>Availability</small><strong>Open for commissions</strong></span><ArrowUpRight size={18} />
+            </a>
+            {navItems.map((item) => (
               <a key={item.id} href={`#${item.id}`} onClick={() => setMenuOpen(false)}>
-                <span>0{index + 1}</span>{item.label}<ArrowIndicator />
+                {item.label}<ArrowIndicator />
               </a>
             ))}
           </motion.nav>

@@ -11,10 +11,8 @@ import {
   Pause,
   Play,
   ShieldCheck,
-  Terminal,
 } from 'lucide-react';
 import FloatingNav from './components/FloatingNav';
-import InteractiveTerminal from './components/InteractiveTerminal';
 import { siteConfig, type SiteProject } from './siteConfig';
 import robloxWordmark from './assets/roblox-wordmark-white.svg';
 
@@ -24,11 +22,6 @@ function getYoutubeId(url: string) {
 
 function projectImage(project: SiteProject) {
   return `https://i.ytimg.com/vi/${getYoutubeId(project.videoUrl)}/maxresdefault.jpg`;
-}
-
-function projectEmbedUrl(project: SiteProject) {
-  const videoId = getYoutubeId(project.videoUrl);
-  return `https://www.youtube-nocookie.com/embed/${videoId}?playsinline=1&rel=0&modestbranding=1`;
 }
 
 const serviceProjectIndexes = [2, 0, 2, 2, 1];
@@ -76,6 +69,65 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
         {isTyping && <i className="typing-caret" />}
       </span>
     </span>
+  );
+}
+
+function AutoplayProjectVideo({ project }: { project: SiteProject }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const startAtOffset = () => {
+      if (video.currentTime < project.startAt) video.currentTime = project.startAt;
+    };
+    const showControls = () => { video.controls = true; };
+    const hideControls = () => { video.controls = false; };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startAtOffset();
+          void video.play();
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.25 },
+    );
+
+    video.addEventListener('loadedmetadata', startAtOffset);
+    video.addEventListener('pointerenter', showControls);
+    video.addEventListener('pointerleave', hideControls);
+    video.addEventListener('focus', showControls);
+    video.addEventListener('blur', hideControls);
+    observer.observe(video);
+
+    return () => {
+      observer.disconnect();
+      video.removeEventListener('loadedmetadata', startAtOffset);
+      video.removeEventListener('pointerenter', showControls);
+      video.removeEventListener('pointerleave', hideControls);
+      video.removeEventListener('focus', showControls);
+      video.removeEventListener('blur', hideControls);
+    };
+  }, [project.startAt]);
+
+  return (
+    <div className="project-video-shell">
+      <video
+        ref={videoRef}
+        src={`${import.meta.env.BASE_URL}${project.videoFile}`}
+        poster={projectImage(project)}
+        aria-label={`${project.title} video`}
+        tabIndex={0}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+      />
+    </div>
   );
 }
 
@@ -187,9 +239,8 @@ function App() {
               <p className="hero-title"><TypingText text={siteConfig.hero.title} disabled={Boolean(reduceMotion)} /></p>
               <p className="hero-description">{siteConfig.hero.description}</p>
               <div className="hero-stats" aria-label="Experience, pricing, and client count">
-                {siteConfig.hero.stats.map((stat, index) => (
+                {siteConfig.hero.stats.map((stat) => (
                   <div key={stat.label} className="hero-stat">
-                    <span>{String(index + 1).padStart(2, '0')}</span>
                     <strong>{stat.value}</strong>
                     <small>{stat.label}</small>
                   </div>
@@ -209,14 +260,13 @@ function App() {
         </section>
 
         <div className="principle-strip" aria-label="Engineering principles">
-          {siteConfig.about.highlights.map((item, index) => (
-            <span key={item}><b>{String(index + 1).padStart(2, '0')}</b>{item}</span>
+          {siteConfig.about.highlights.map((item) => (
+            <span key={item}>{item}</span>
           ))}
         </div>
 
         <section id="work" className="section work-section">
           <div className="section-intro page-grid">
-            <div className="section-number">01 / Projects</div>
             <div className="section-title">
               <p className="eyebrow">{siteConfig.projects.eyebrow}</p>
               <h2>Selected<br />{' '}projects.</h2>
@@ -225,7 +275,7 @@ function App() {
           </div>
 
           <div className="project-list">
-            {siteConfig.projects.items.map((project, index) => (
+            {siteConfig.projects.items.map((project) => (
               <motion.article
                 key={project.title}
                 className="project-row page-grid"
@@ -235,16 +285,8 @@ function App() {
                 viewport={{ once: true, margin: '-8%' }}
                 transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="project-index">P/{String(index + 1).padStart(2, '0')}</div>
                 <div className="project-media">
-                  <iframe
-                    src={projectEmbedUrl(project)}
-                    title={`${project.title} video`}
-                    loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    referrerPolicy="strict-origin-when-cross-origin"
-                  />
+                  <AutoplayProjectVideo project={project} />
                 </div>
                 <div className="project-copy">
                   <p className="eyebrow">{project.category}</p>
@@ -262,7 +304,6 @@ function App() {
 
         <section id="services" className="section systems-section">
           <div className="page-grid systems-heading">
-            <div className="section-number light">02 / Systems</div>
             <div>
               <p className="eyebrow light">{siteConfig.services.eyebrow}</p>
               <h2>{siteConfig.services.title}</h2>
@@ -278,14 +319,7 @@ function App() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.32 }}
             >
-              <iframe
-                src={projectEmbedUrl(relatedServiceProject)}
-                title={`${relatedServiceProject.title} video`}
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
+              <AutoplayProjectVideo project={relatedServiceProject} />
             </motion.div>
 
             <div className="systems-panel">
@@ -299,7 +333,7 @@ function App() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25 }}
               >
-                <span>Selected / {String(activeService + 1).padStart(2, '0')}</span>
+                <span>Core development area</span>
                 <h3>{activeServiceItem.title}</h3>
                 <p>{activeServiceItem.description}</p>
               </motion.div>
@@ -318,7 +352,6 @@ function App() {
                     onClick={() => setActiveService(index)}
                     onKeyDown={(event) => handleServiceKeyDown(event, index)}
                   >
-                    <span>{String(index + 1).padStart(2, '0')}</span>
                     <strong>{item.title}</strong>
                     <ChevronRight size={19} />
                   </button>
@@ -331,14 +364,12 @@ function App() {
         <section id="skills" className="section stack-section">
           <div className="page-grid stack-layout">
             <div className="stack-heading">
-              <div className="section-number">03 / Tools</div>
               <p className="eyebrow">{siteConfig.skills.eyebrow}</p>
               <h2>{siteConfig.skills.title}</h2>
             </div>
             <div className="stack-groups">
-              {siteConfig.skills.groups.map((group, index) => (
+              {siteConfig.skills.groups.map((group) => (
                 <div className="stack-group" key={group.category}>
-                  <span>0{index + 1}</span>
                   <h3>{group.category}</h3>
                   <ul>
                     {group.items.map((item) => <li key={item}><Check size={14} />{item}</li>)}
@@ -355,7 +386,6 @@ function App() {
           </div>
           <div className="page-grid about-layout">
             <div className="about-heading">
-              <div className="section-number light">04 / About</div>
               <p className="eyebrow light">{siteConfig.about.eyebrow}</p>
               <h2>{siteConfig.about.title}</h2>
             </div>
@@ -363,23 +393,10 @@ function App() {
               {siteConfig.about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
             </div>
             <div className="principle-list" aria-label="Engineering principles">
-              {siteConfig.about.highlights.map((item, index) => (
-                <span key={item}><b>{String(index + 1).padStart(2, '0')}</b>{item}<i /></span>
+              {siteConfig.about.highlights.map((item) => (
+                <span key={item}>{item}<i /></span>
               ))}
             </div>
-          </div>
-        </section>
-
-        <section id="terminal" className="section terminal-section">
-          <div className="page-grid terminal-layout">
-            <div className="terminal-intro">
-              <div className="section-number light">05 / Console</div>
-              <p className="eyebrow light">{siteConfig.terminal.eyebrow}</p>
-              <Terminal size={28} />
-              <h2>{siteConfig.terminal.title}</h2>
-              <p>{siteConfig.terminal.intro}</p>
-            </div>
-            <InteractiveTerminal {...siteConfig.terminal} />
           </div>
         </section>
 
