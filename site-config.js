@@ -23,12 +23,14 @@ window.__SITE_CONFIG__ = {
     { id: 'contact', label: 'Contact' },
   ],
   hero: {
-    eyebrow: 'Roblox programmer',
+    eyebrow: 'Realistic FPS shooter',
     headline: ['Roblox', 'Development'],
-    videoId: 'bzXzGMbdQfY',
-    title: 'Gameplay systems, backend code, and tools.',
+    videoId: 'S3APny6lG5I',
+    videoFile: 'videos/realistic-fps-shooter.mp4',
+    startAt: 7,
+    title: 'Realistic FPS combat, backend code, and tools.',
     description:
-      'Movement, combat, persistent data, server architecture, admin tooling, UI, and performance - built and tested in Roblox Studio.',
+      'A realistic first-person shooter system alongside movement, persistent data, server architecture, admin tooling, UI, and performance - built and tested in Roblox Studio.',
     primaryCta: 'View projects',
     secondaryCta: 'Discord',
     stats: [
@@ -125,11 +127,23 @@ window.__SITE_CONFIG__ = {
   },
   projects: {
     eyebrow: 'Selected projects',
-    title: 'Five working Roblox systems',
+    title: 'Six working Roblox systems',
     intro:
-      'Traversal, first-person combat, live administration, procedural terrain, and raycast rendering. Every project includes a video of the system running in Roblox Studio.',
+      'Realistic FPS combat, traversal, live administration, procedural terrain, and raycast rendering. Every project includes a video of the system running in Roblox Studio.',
     previewLabel: 'Video',
     items: [
+      {
+        title: 'Realistic FPS Shooter',
+        category: 'First-person shooter',
+        description:
+          'Realistic first-person shooter system with weapon handling, camera motion, responsive firing, raycast hit detection, and combat feedback.',
+        outcome:
+          'Weapon response, camera recoil, animation, and hit logic stay synchronized through every encounter.',
+        stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Weapon systems', 'Combat feedback'],
+        videoUrl: 'https://youtu.be/S3APny6lG5I',
+        videoFile: 'videos/realistic-fps-shooter.mp4',
+        startAt: 7,
+      },
       {
         title: 'Spider-Man Movement System',
         category: 'Traversal system',

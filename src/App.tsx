@@ -24,7 +24,7 @@ function projectImage(project: SiteProject) {
   return `https://i.ytimg.com/vi/${getYoutubeId(project.videoUrl)}/maxresdefault.jpg`;
 }
 
-const serviceProjectIndexes = [2, 0, 2, 2, 1];
+const serviceProjectIndexes = [3, 0, 3, 3, 0];
 
 const reveal = {
   hidden: { opacity: 0, y: 26 },
@@ -135,6 +135,7 @@ function App() {
   const [activeService, setActiveService] = useState(0);
   const [copied, setCopied] = useState('');
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
@@ -142,6 +143,26 @@ function App() {
   useEffect(() => {
     if (reduceMotion) setHeroVideoPlaying(false);
   }, [reduceMotion]);
+
+  useEffect(() => {
+    const video = heroVideoRef.current;
+    if (!video) return;
+
+    const startAtOffset = () => {
+      if (video.currentTime < siteConfig.hero.startAt) video.currentTime = siteConfig.hero.startAt;
+    };
+
+    if (video.readyState >= 1) startAtOffset();
+    video.addEventListener('loadedmetadata', startAtOffset);
+
+    if (heroVideoPlaying && !reduceMotion) {
+      void video.play();
+    } else {
+      video.pause();
+    }
+
+    return () => video.removeEventListener('loadedmetadata', startAtOffset);
+  }, [heroVideoPlaying, reduceMotion]);
 
   useEffect(() => {
     document.title = siteConfig.meta.title;
@@ -196,18 +217,20 @@ function App() {
           <div className="hero-media">
             <img
               src={`https://i.ytimg.com/vi/${siteConfig.hero.videoId}/maxresdefault.jpg`}
-              alt="Animated Roblox characters from the Roblox Anthem video"
+              alt="Realistic FPS shooter gameplay"
             />
-            {!reduceMotion && heroVideoPlaying && (
-              <iframe
-                src={`https://www.youtube.com/embed/${siteConfig.hero.videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${siteConfig.hero.videoId}&playsinline=1&rel=0&modestbranding=1&disablekb=1`}
-                title="Roblox Anthem background video"
-                tabIndex={-1}
-                aria-hidden="true"
-                allow="autoplay; encrypted-media"
-                referrerPolicy="strict-origin-when-cross-origin"
-              />
-            )}
+            <video
+              ref={heroVideoRef}
+              className="hero-video"
+              src={`${import.meta.env.BASE_URL}${siteConfig.hero.videoFile}`}
+              poster={`https://i.ytimg.com/vi/${siteConfig.hero.videoId}/maxresdefault.jpg`}
+              aria-hidden="true"
+              muted
+              loop
+              playsInline
+              autoPlay={!reduceMotion}
+              preload="metadata"
+            />
           </div>
           <div className="hero-overlay" aria-hidden="true" />
           <div className="hero-rule" aria-hidden="true" />
@@ -382,7 +405,7 @@ function App() {
 
         <section id="about" className="section about-section">
           <div className="about-media">
-            <img src={projectImage(siteConfig.projects.items[1])} alt="First-person combat system gameplay frame" loading="lazy" />
+            <img src={projectImage(siteConfig.projects.items[0])} alt="Realistic FPS shooter gameplay frame" loading="lazy" />
           </div>
           <div className="page-grid about-layout">
             <div className="about-heading">
