@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import type Hls from 'hls.js';
 import {
   ArrowDown,
@@ -222,6 +222,8 @@ function App() {
   const [activeService, setActiveService] = useState(0);
   const [copied, setCopied] = useState('');
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
+  const [heroMediaReady, setHeroMediaReady] = useState(false);
+  const [loaderVisible, setLoaderVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
@@ -230,6 +232,27 @@ function App() {
   useEffect(() => {
     if (reduceMotion) setHeroVideoPlaying(false);
   }, [reduceMotion]);
+
+  useEffect(() => {
+    const safetyId = window.setTimeout(() => setLoaderVisible(false), 2400);
+    const readyId = heroMediaReady
+      ? window.setTimeout(() => setLoaderVisible(false), reduceMotion ? 0 : 550)
+      : 0;
+
+    return () => {
+      window.clearTimeout(safetyId);
+      window.clearTimeout(readyId);
+    };
+  }, [heroMediaReady, reduceMotion]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('site-is-loading', loaderVisible);
+    document.body.classList.toggle('site-is-loading', loaderVisible);
+    return () => {
+      document.documentElement.classList.remove('site-is-loading');
+      document.body.classList.remove('site-is-loading');
+    };
+  }, [loaderVisible]);
 
   useEffect(() => {
     const video = heroVideoRef.current;
@@ -303,7 +326,29 @@ function App() {
   const activeServiceItem = siteConfig.services.items[activeService];
 
   return (
-    <div className="site-shell">
+    <div className="site-shell" aria-busy={loaderVisible}>
+      <AnimatePresence>
+        {loaderVisible && (
+          <motion.div
+            className={`site-loader${heroMediaReady ? ' is-ready' : ''}`}
+            role="status"
+            aria-live="polite"
+            initial={false}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="site-loader-inner">
+              <div className="site-loader-brand" aria-label={`${siteConfig.brand.name} portfolio`}>
+                <span className="site-loader-mark" aria-hidden="true">V</span>
+                <strong>{siteConfig.brand.name}</strong>
+              </div>
+              <div className="site-loader-track" aria-hidden="true"><span /></div>
+              <p>{heroMediaReady ? 'Ready' : 'Loading portfolio'}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <a className="skip-link" href="#work">Skip to projects</a>
       <FloatingNav brandName={siteConfig.brand.name} items={siteConfig.navigation} />
 
@@ -314,6 +359,8 @@ function App() {
               src={videoPoster(siteConfig.hero.videoFile)}
               alt="Realistic FPS shooter gameplay"
               fetchPriority="high"
+              onLoad={() => setHeroMediaReady(true)}
+              onError={() => setHeroMediaReady(true)}
             />
             <video
               ref={heroVideoRef}
