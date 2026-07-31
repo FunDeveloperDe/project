@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowDown,
   ArrowRight,
@@ -8,9 +8,12 @@ import {
   Check,
   ChevronRight,
   Copy,
+  Maximize,
   Pause,
   Play,
   ShieldCheck,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 import FloatingNav from './components/FloatingNav';
 import { siteConfig, type SiteProject } from './siteConfig';
@@ -33,8 +36,9 @@ function youtubeEmbedUrl(project: SiteProject) {
   const videoId = youtubeVideoId(project.videoUrl);
   const params = new URLSearchParams({
     autoplay: '1',
-    controls: '1',
+    controls: '0',
     enablejsapi: '1',
+    iv_load_policy: '3',
     loop: '1',
     mute: '1',
     origin: window.location.origin,
@@ -46,6 +50,10 @@ function youtubeEmbedUrl(project: SiteProject) {
   });
 
   return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
+}
+
+function sendYouTubeCommand(iframe: HTMLIFrameElement, command: string) {
+  iframe.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args: [] }), 'https://www.youtube.com');
 }
 
 const serviceProjectIndexes = [3, 0, 3, 3, 0];
@@ -98,19 +106,19 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
 
 function YouTubeProjectVideo({ project }: { project: SiteProject }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
 
     let isVisible = false;
-    const sendCommand = (command: 'playVideo' | 'pauseVideo') => {
-      iframe.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args: [] }), 'https://www.youtube.com');
-    };
-    const syncPlayback = () => sendCommand(isVisible ? 'playVideo' : 'pauseVideo');
+    const syncPlayback = () => sendYouTubeCommand(iframe, isVisible ? 'playVideo' : 'pauseVideo');
     const observer = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;
+        setIsPlaying(isVisible);
         syncPlayback();
       },
       { threshold: 0.25 },
@@ -125,6 +133,27 @@ function YouTubeProjectVideo({ project }: { project: SiteProject }) {
     };
   }, []);
 
+  const togglePlayback = () => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    const nextPlaying = !isPlaying;
+    sendYouTubeCommand(iframe, nextPlaying ? 'playVideo' : 'pauseVideo');
+    setIsPlaying(nextPlaying);
+  };
+
+  const toggleMute = () => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+    const nextMuted = !isMuted;
+    sendYouTubeCommand(iframe, nextMuted ? 'mute' : 'unMute');
+    setIsMuted(nextMuted);
+  };
+
+  const enterFullscreen = () => {
+    const iframe = iframeRef.current;
+    if (iframe) void iframe.requestFullscreen().catch(() => undefined);
+  };
+
   return (
     <div className="project-video-shell">
       <iframe
@@ -135,6 +164,17 @@ function YouTubeProjectVideo({ project }: { project: SiteProject }) {
         allow="autoplay; encrypted-media; picture-in-picture"
         allowFullScreen
       />
+      <div className="project-video-controls" aria-label={`${project.title} controls`}>
+        <button type="button" onClick={togglePlayback} aria-label={isPlaying ? 'Pause video' : 'Play video'} title={isPlaying ? 'Pause' : 'Play'}>
+          {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
+        </button>
+        <button type="button" onClick={toggleMute} aria-label={isMuted ? 'Unmute video' : 'Mute video'} title={isMuted ? 'Unmute' : 'Mute'}>
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        </button>
+        <button type="button" onClick={enterFullscreen} aria-label="View video fullscreen" title="Fullscreen">
+          <Maximize size={18} />
+        </button>
+      </div>
     </div>
   );
 }
@@ -143,37 +183,14 @@ function App() {
   const [activeService, setActiveService] = useState(0);
   const [copied, setCopied] = useState('');
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
-  const [heroMediaReady, setHeroMediaReady] = useState(false);
-  const [loaderVisible, setLoaderVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
-  const loaderProgress = heroMediaReady ? 1 : 0.16;
 
   useEffect(() => {
     if (reduceMotion) setHeroVideoPlaying(false);
   }, [reduceMotion]);
-
-  useEffect(() => {
-    const safetyId = window.setTimeout(() => setLoaderVisible(false), 2400);
-    return () => window.clearTimeout(safetyId);
-  }, []);
-
-  useEffect(() => {
-    if (!heroMediaReady) return;
-    const readyId = window.setTimeout(() => setLoaderVisible(false), reduceMotion ? 0 : 550);
-    return () => window.clearTimeout(readyId);
-  }, [heroMediaReady, reduceMotion]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle('site-is-loading', loaderVisible);
-    document.body.classList.toggle('site-is-loading', loaderVisible);
-    return () => {
-      document.documentElement.classList.remove('site-is-loading');
-      document.body.classList.remove('site-is-loading');
-    };
-  }, [loaderVisible]);
 
   useEffect(() => {
     const video = heroVideoRef.current;
@@ -247,38 +264,7 @@ function App() {
   const activeServiceItem = siteConfig.services.items[activeService];
 
   return (
-    <div className="site-shell" aria-busy={loaderVisible}>
-      <AnimatePresence>
-        {loaderVisible && (
-          <motion.div
-            className={`site-loader${heroMediaReady ? ' is-ready' : ''}`}
-            role="status"
-            aria-live="polite"
-            initial={false}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <div className="site-loader-inner">
-              <div className="site-loader-brand" aria-label={`${siteConfig.brand.name} portfolio`}>
-                <span className="site-loader-mark" aria-hidden="true">V</span>
-                <strong>{siteConfig.brand.name}</strong>
-              </div>
-              <div
-                className="site-loader-track"
-                role="progressbar"
-                aria-label="Loading project videos"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={Math.round(loaderProgress * 100)}
-              >
-                <span style={{ transform: `scaleX(${Math.max(0.04, loaderProgress)})` }} />
-              </div>
-              <p>{heroMediaReady ? 'Ready' : 'Loading portfolio'}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+    <div className="site-shell">
       <a className="skip-link" href="#work">Skip to projects</a>
       <FloatingNav brandName={siteConfig.brand.name} items={siteConfig.navigation} />
 
@@ -288,9 +274,6 @@ function App() {
             <img
               src={videoPoster(siteConfig.hero.videoFile)}
               alt="Realistic FPS shooter gameplay"
-              fetchPriority="high"
-              onLoad={() => setHeroMediaReady(true)}
-              onError={() => setHeroMediaReady(true)}
             />
             <video
               ref={heroVideoRef}
