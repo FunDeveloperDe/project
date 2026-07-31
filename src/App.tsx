@@ -327,6 +327,9 @@ function App() {
                   <ul className="project-stack" aria-label={`${project.title} technologies`}>
                     {project.stack.map((item) => <li key={item}>{item}</li>)}
                   </ul>
+                  <a className="text-link" href={project.videoUrl} target="_blank" rel="noreferrer">
+                    Full video<ArrowUpRight size={17} />
+                  </a>
                 </div>
               </motion.article>
             ))}

@@ -142,7 +142,7 @@ window.__SITE_CONFIG__ = {
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Weapon systems', 'Combat feedback'],
         videoUrl: 'https://youtu.be/S3APny6lG5I',
         videoFile: 'videos/realistic-fps-shooter.mp4',
-        startAt: 7,
+        startAt: 0,
       },
       {
         title: 'Spider-Man Movement System',
@@ -154,7 +154,7 @@ window.__SITE_CONFIG__ = {
         stack: ['Roblox Luau', 'Physics', 'Raycasting', 'Camera systems', 'Input handling'],
         videoUrl: 'https://youtu.be/PsKBOt1Od14',
         videoFile: 'videos/spiderman-movement.mp4',
-        startAt: 5,
+        startAt: 0,
       },
       {
         title: 'FPS Pistol System',
@@ -166,7 +166,7 @@ window.__SITE_CONFIG__ = {
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Camera control', 'Input handling'],
         videoUrl: 'https://youtu.be/V3xgPGcSTic',
         videoFile: 'videos/fps-pistol.mp4',
-        startAt: 9,
+        startAt: 0,
       },
       {
         title: 'Web-Based Game Administration',
@@ -178,7 +178,7 @@ window.__SITE_CONFIG__ = {
         stack: ['Roblox Luau', 'HTTPService', 'Web API', 'Cross-server messaging', 'Authentication'],
         videoUrl: 'https://youtu.be/zKCMLSKQytY',
         videoFile: 'videos/web-administration.mp4',
-        startAt: 1,
+        startAt: 0,
       },
       {
         title: 'Procedural Terrain Generation',
@@ -190,7 +190,7 @@ window.__SITE_CONFIG__ = {
         stack: ['Roblox Luau', 'Procedural generation', 'Noise', 'Chunk loading', 'Asset spawning'],
         videoUrl: 'https://youtu.be/rTRbfrchyrE',
         videoFile: 'videos/procedural-terrain.mp4',
-        startAt: 3,
+        startAt: 0,
       },
       {
         title: 'Raycast Rendering System',
@@ -202,7 +202,7 @@ window.__SITE_CONFIG__ = {
         stack: ['Roblox Luau', 'Raycasting', 'Rendering logic', 'Lighting simulation', 'Optimization'],
         videoUrl: 'https://youtu.be/JkfpLhObRBQ',
         videoFile: 'videos/raycast-rendering.mp4',
-        startAt: 13,
+        startAt: 0,
       },
     ],
   },
