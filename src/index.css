@@ -759,7 +759,9 @@ img {
 }
 
 .project-media video,
-.systems-media video {
+.project-media iframe,
+.systems-media video,
+.systems-media iframe {
   width: 100%;
   height: 100%;
   display: block;

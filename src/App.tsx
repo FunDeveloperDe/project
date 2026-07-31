@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import type Hls from 'hls.js';
 import {
   ArrowDown,
   ArrowRight,
@@ -25,60 +24,28 @@ function projectImage(project: SiteProject) {
   return videoPoster(project.videoFile);
 }
 
-function projectStreamDirectory(videoFile: string) {
-  const fileName = videoFile.split('/').pop() ?? '';
-  return `${import.meta.env.BASE_URL}streams/${fileName.replace(/\.mp4$/i, '')}`;
+function youtubeVideoId(videoUrl: string) {
+  const url = new URL(videoUrl);
+  return url.hostname === 'youtu.be' ? url.pathname.slice(1) : url.searchParams.get('v') ?? '';
 }
 
-function projectStream(videoFile: string) {
-  return `${projectStreamDirectory(videoFile)}/index.m3u8`;
-}
+function youtubeEmbedUrl(project: SiteProject) {
+  const videoId = youtubeVideoId(project.videoUrl);
+  const params = new URLSearchParams({
+    autoplay: '1',
+    controls: '1',
+    enablejsapi: '1',
+    loop: '1',
+    mute: '1',
+    origin: window.location.origin,
+    playlist: videoId,
+    playsinline: '1',
+    rel: '0',
+    start: String(project.startAt),
+    vq: 'hd1080',
+  });
 
-async function preloadAllProjectVideos(
-  videoFiles: string[],
-  signal: AbortSignal,
-  onProgress: (progress: number) => void,
-) {
-  const manifests = await Promise.all(videoFiles.map(async (videoFile) => {
-    const manifestUrl = projectStream(videoFile);
-    const response = await fetch(manifestUrl, { cache: 'force-cache', signal });
-    if (!response.ok) throw new Error(`Unable to preload ${response.url}`);
-
-    const manifest = await response.text();
-    const streamDirectory = projectStreamDirectory(videoFile);
-    const initFile = manifest.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
-    const segmentFiles = manifest
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line && !line.startsWith('#'));
-
-    if (!initFile || segmentFiles.length === 0) throw new Error(`Invalid stream manifest: ${manifestUrl}`);
-    return [initFile, ...segmentFiles].map((file) => `${streamDirectory}/${file}`);
-  }));
-
-  const assetUrls = manifests.flat();
-  const totalFiles = videoFiles.length + assetUrls.length;
-  let completedFiles = videoFiles.length;
-  let nextAssetIndex = 0;
-
-  onProgress(completedFiles / totalFiles);
-
-  const downloadNextAsset = async () => {
-    while (nextAssetIndex < assetUrls.length) {
-      const assetIndex = nextAssetIndex;
-      nextAssetIndex += 1;
-
-      const response = await fetch(assetUrls[assetIndex], { cache: 'force-cache', signal });
-      if (!response.ok) throw new Error(`Unable to preload ${response.url}`);
-      await response.arrayBuffer();
-
-      completedFiles += 1;
-      onProgress(completedFiles / totalFiles);
-    }
-  };
-
-  const workerCount = Math.min(4, assetUrls.length);
-  await Promise.all(Array.from({ length: workerCount }, () => downloadNextAsset()));
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
 }
 
 const serviceProjectIndexes = [3, 0, 3, 3, 0];
@@ -129,143 +96,44 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
   );
 }
 
-function AutoplayProjectVideo({ project, enabled }: { project: SiteProject; enabled: boolean }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
+function YouTubeProjectVideo({ project }: { project: SiteProject }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    if (!enabled) return;
+    const iframe = iframeRef.current;
+    if (!iframe) return;
 
-    const video = videoRef.current;
-    const shell = shellRef.current;
-    if (!video || !shell) return;
-
-    let hls: Hls | null = null;
-    let streamLoaded = false;
-    let shouldPlay = false;
-    let disposed = false;
-    let controlsHideTimer = 0;
-
-    const hideControls = () => {
-      window.clearTimeout(controlsHideTimer);
-      video.controls = false;
+    let isVisible = false;
+    const sendCommand = (command: 'playVideo' | 'pauseVideo') => {
+      iframe.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: command, args: [] }), 'https://www.youtube.com');
     };
-    const showControls = () => {
-      window.clearTimeout(controlsHideTimer);
-      video.controls = true;
-      controlsHideTimer = window.setTimeout(hideControls, 1800);
-    };
-    const attemptPlay = () => {
-      if (shouldPlay && video.currentSrc) void video.play().catch(() => undefined);
-    };
-    const expandBuffer = () => {
-      if (hls) hls.config.maxBufferLength = 30;
-    };
-    const loadFallback = () => {
-      hls?.destroy();
-      hls = null;
-      video.src = `${import.meta.env.BASE_URL}${project.videoFile}`;
-      video.load();
-    };
-    const loadStream = async () => {
-      if (streamLoaded) return;
-      streamLoaded = true;
-
-      const streamUrl = projectStream(project.videoFile);
-
-      if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = streamUrl;
-        video.load();
-        return;
-      }
-
-      const { default: HlsPlayer } = await import('hls.js');
-      if (disposed) return;
-
-      if (HlsPlayer.isSupported()) {
-        hls = new HlsPlayer({
-          autoStartLoad: true,
-          backBufferLength: 20,
-          capLevelToPlayerSize: true,
-          maxBufferLength: 10,
-          maxMaxBufferLength: 30,
-        });
-        hls.on(HlsPlayer.Events.MANIFEST_PARSED, attemptPlay);
-        hls.on(HlsPlayer.Events.ERROR, (_event, data) => {
-          if (data.fatal) loadFallback();
-        });
-        hls.loadSource(streamUrl);
-        hls.attachMedia(video);
-      } else {
-        loadFallback();
-      }
-    };
-    const requestStream = () => {
-      void loadStream().catch(() => {
-        if (!disposed) loadFallback();
-      });
-    };
-
-    const loadObserver = new IntersectionObserver(
+    const syncPlayback = () => sendCommand(isVisible ? 'playVideo' : 'pauseVideo');
+    const observer = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
-        requestStream();
-        loadObserver.disconnect();
-      },
-      { rootMargin: '600px 0px', threshold: 0 },
-    );
-    const playObserver = new IntersectionObserver(
-      ([entry]) => {
-        shouldPlay = entry.isIntersecting;
-        if (entry.isIntersecting) {
-          requestStream();
-          attemptPlay();
-        } else {
-          video.pause();
-        }
+        isVisible = entry.isIntersecting;
+        syncPlayback();
       },
       { threshold: 0.25 },
     );
 
-    video.addEventListener('canplay', attemptPlay);
-    video.addEventListener('playing', expandBuffer);
-    shell.addEventListener('pointerenter', showControls);
-    shell.addEventListener('pointerleave', hideControls);
-    shell.addEventListener('mousemove', showControls);
-    shell.addEventListener('mouseleave', hideControls);
-    video.addEventListener('focus', showControls);
-    video.addEventListener('blur', hideControls);
-    loadObserver.observe(video);
-    playObserver.observe(video);
+    iframe.addEventListener('load', syncPlayback);
+    observer.observe(iframe);
 
     return () => {
-      disposed = true;
-      window.clearTimeout(controlsHideTimer);
-      loadObserver.disconnect();
-      playObserver.disconnect();
-      video.removeEventListener('canplay', attemptPlay);
-      video.removeEventListener('playing', expandBuffer);
-      shell.removeEventListener('pointerenter', showControls);
-      shell.removeEventListener('pointerleave', hideControls);
-      shell.removeEventListener('mousemove', showControls);
-      shell.removeEventListener('mouseleave', hideControls);
-      video.removeEventListener('focus', showControls);
-      video.removeEventListener('blur', hideControls);
-      hls?.destroy();
+      iframe.removeEventListener('load', syncPlayback);
+      observer.disconnect();
     };
-  }, [enabled, project.videoFile]);
+  }, []);
 
   return (
-    <div ref={shellRef} className="project-video-shell">
-      <video
-        ref={videoRef}
-        poster={projectImage(project)}
-        aria-label={`${project.title} video`}
-        tabIndex={0}
-        muted
-        loop
-        playsInline
-        preload="none"
+    <div className="project-video-shell">
+      <iframe
+        ref={iframeRef}
+        src={youtubeEmbedUrl(project)}
+        title={`${project.title} video`}
+        loading="eager"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowFullScreen
       />
     </div>
   );
@@ -276,51 +144,27 @@ function App() {
   const [copied, setCopied] = useState('');
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
   const [heroMediaReady, setHeroMediaReady] = useState(false);
-  const [projectVideosReady, setProjectVideosReady] = useState(false);
-  const [projectVideosFailed, setProjectVideosFailed] = useState(false);
-  const [projectVideoProgress, setProjectVideoProgress] = useState(0);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
-  const loaderReady = heroMediaReady && projectVideosReady;
-  const loaderCanExit = heroMediaReady && (projectVideosReady || projectVideosFailed);
-  const loaderProgress = Math.min(1, (projectVideoProgress * 0.95) + (heroMediaReady ? 0.05 : 0));
+  const loaderProgress = heroMediaReady ? 1 : 0.16;
 
   useEffect(() => {
     if (reduceMotion) setHeroVideoPlaying(false);
   }, [reduceMotion]);
 
   useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-    const timeoutId = window.setTimeout(() => controller.abort(), 120000);
-    const videoFiles = siteConfig.projects.items.map((project) => project.videoFile);
-
-    void preloadAllProjectVideos(videoFiles, controller.signal, (progress) => {
-      if (active) setProjectVideoProgress(progress);
-    })
-      .then(() => {
-        if (active) setProjectVideosReady(true);
-      })
-      .catch(() => {
-        if (active) setProjectVideosFailed(true);
-      })
-      .finally(() => window.clearTimeout(timeoutId));
-
-    return () => {
-      active = false;
-      window.clearTimeout(timeoutId);
-      controller.abort();
-    };
+    const safetyId = window.setTimeout(() => setLoaderVisible(false), 2400);
+    return () => window.clearTimeout(safetyId);
   }, []);
 
   useEffect(() => {
-    if (!loaderCanExit) return;
+    if (!heroMediaReady) return;
     const readyId = window.setTimeout(() => setLoaderVisible(false), reduceMotion ? 0 : 550);
     return () => window.clearTimeout(readyId);
-  }, [loaderCanExit, reduceMotion]);
+  }, [heroMediaReady, reduceMotion]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('site-is-loading', loaderVisible);
@@ -407,7 +251,7 @@ function App() {
       <AnimatePresence>
         {loaderVisible && (
           <motion.div
-            className={`site-loader${loaderReady ? ' is-ready' : ''}`}
+            className={`site-loader${heroMediaReady ? ' is-ready' : ''}`}
             role="status"
             aria-live="polite"
             initial={false}
@@ -429,7 +273,7 @@ function App() {
               >
                 <span style={{ transform: `scaleX(${Math.max(0.04, loaderProgress)})` }} />
               </div>
-              <p>{projectVideosFailed ? 'Continuing on demand' : loaderReady ? 'Ready' : 'Downloading project videos'}</p>
+              <p>{heroMediaReady ? 'Ready' : 'Loading portfolio'}</p>
             </div>
           </motion.div>
         )}
@@ -537,7 +381,7 @@ function App() {
                 transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="project-media">
-                  <AutoplayProjectVideo project={project} enabled={!loaderVisible} />
+                  <YouTubeProjectVideo project={project} />
                 </div>
                 <div className="project-copy">
                   <p className="eyebrow">{project.category}</p>
@@ -573,7 +417,7 @@ function App() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.32 }}
             >
-              <AutoplayProjectVideo project={relatedServiceProject} enabled={!loaderVisible} />
+              <YouTubeProjectVideo project={relatedServiceProject} />
             </motion.div>
 
             <div className="systems-panel">
