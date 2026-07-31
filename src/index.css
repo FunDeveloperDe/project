@@ -694,54 +694,6 @@ img {
   background: var(--coal);
 }
 
-.project-video-controls {
-  position: absolute;
-  right: 0.8rem;
-  bottom: 0.8rem;
-  z-index: 2;
-  display: flex;
-  gap: 0.35rem;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(6px);
-  transition: opacity 160ms ease, transform 160ms var(--ease);
-}
-
-.project-video-shell:hover .project-video-controls,
-.project-video-shell:focus-within .project-video-controls {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
-}
-
-.project-video-controls button {
-  width: 2.6rem;
-  height: 2.6rem;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 0;
-  color: var(--white);
-  background: rgba(11, 13, 18, 0.84);
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-}
-
-.project-video-controls button:hover {
-  border-color: var(--status);
-  color: var(--ink);
-  background: var(--status);
-}
-
-@media (hover: none) {
-  .project-video-controls {
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-  }
-}
-
 .project-copy {
   grid-column: 9 / 13;
   grid-row: 1;

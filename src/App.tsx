@@ -8,12 +8,9 @@ import {
   Check,
   ChevronRight,
   Copy,
-  Maximize,
   Pause,
   Play,
   ShieldCheck,
-  Volume2,
-  VolumeX,
 } from 'lucide-react';
 import FloatingNav from './components/FloatingNav';
 import { siteConfig, type SiteProject } from './siteConfig';
@@ -36,7 +33,7 @@ function youtubeEmbedUrl(project: SiteProject) {
   const videoId = youtubeVideoId(project.videoUrl);
   const params = new URLSearchParams({
     autoplay: '1',
-    controls: '0',
+    controls: '1',
     enablejsapi: '1',
     iv_load_policy: '3',
     loop: '1',
@@ -106,8 +103,6 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
 
 function YouTubeProjectVideo({ project }: { project: SiteProject }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -118,7 +113,6 @@ function YouTubeProjectVideo({ project }: { project: SiteProject }) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;
-        setIsPlaying(isVisible);
         syncPlayback();
       },
       { threshold: 0.25 },
@@ -133,27 +127,6 @@ function YouTubeProjectVideo({ project }: { project: SiteProject }) {
     };
   }, []);
 
-  const togglePlayback = () => {
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-    const nextPlaying = !isPlaying;
-    sendYouTubeCommand(iframe, nextPlaying ? 'playVideo' : 'pauseVideo');
-    setIsPlaying(nextPlaying);
-  };
-
-  const toggleMute = () => {
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-    const nextMuted = !isMuted;
-    sendYouTubeCommand(iframe, nextMuted ? 'mute' : 'unMute');
-    setIsMuted(nextMuted);
-  };
-
-  const enterFullscreen = () => {
-    const iframe = iframeRef.current;
-    if (iframe) void iframe.requestFullscreen().catch(() => undefined);
-  };
-
   return (
     <div className="project-video-shell">
       <iframe
@@ -164,17 +137,6 @@ function YouTubeProjectVideo({ project }: { project: SiteProject }) {
         allow="autoplay; encrypted-media; picture-in-picture"
         allowFullScreen
       />
-      <div className="project-video-controls" aria-label={`${project.title} controls`}>
-        <button type="button" onClick={togglePlayback} aria-label={isPlaying ? 'Pause video' : 'Play video'} title={isPlaying ? 'Pause' : 'Play'}>
-          {isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" />}
-        </button>
-        <button type="button" onClick={toggleMute} aria-label={isMuted ? 'Unmute video' : 'Mute video'} title={isMuted ? 'Unmute' : 'Mute'}>
-          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        </button>
-        <button type="button" onClick={enterFullscreen} aria-label="View video fullscreen" title="Fullscreen">
-          <Maximize size={18} />
-        </button>
-      </div>
     </div>
   );
 }
