@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import type Hls from 'hls.js';
 import {
   ArrowDown,
   ArrowRight,
@@ -22,6 +23,11 @@ function videoPoster(videoFile: string) {
 
 function projectImage(project: SiteProject) {
   return videoPoster(project.videoFile);
+}
+
+function projectStream(videoFile: string) {
+  const fileName = videoFile.split('/').pop() ?? '';
+  return `${import.meta.env.BASE_URL}streams/${fileName.replace(/\.mp4$/i, '')}/index.m3u8`;
 }
 
 const serviceProjectIndexes = [3, 0, 3, 3, 0];
@@ -74,22 +80,93 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
 
 function AutoplayProjectVideo({ project }: { project: SiteProject }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    const shell = shellRef.current;
+    if (!video || !shell) return;
 
-    const startAtOffset = () => {
-      if (video.currentTime < project.startAt) video.currentTime = project.startAt;
+    let hls: Hls | null = null;
+    let streamLoaded = false;
+    let shouldPlay = false;
+    let disposed = false;
+    let controlsHideTimer = 0;
+
+    const hideControls = () => {
+      window.clearTimeout(controlsHideTimer);
+      video.controls = false;
     };
-    const showControls = () => { video.controls = true; };
-    const hideControls = () => { video.controls = false; };
+    const showControls = () => {
+      window.clearTimeout(controlsHideTimer);
+      video.controls = true;
+      controlsHideTimer = window.setTimeout(hideControls, 1800);
+    };
+    const attemptPlay = () => {
+      if (shouldPlay && video.currentSrc) void video.play().catch(() => undefined);
+    };
+    const expandBuffer = () => {
+      if (hls) hls.config.maxBufferLength = 30;
+    };
+    const loadFallback = () => {
+      hls?.destroy();
+      hls = null;
+      video.src = `${import.meta.env.BASE_URL}${project.videoFile}`;
+      video.load();
+    };
+    const loadStream = async () => {
+      if (streamLoaded) return;
+      streamLoaded = true;
 
-    const observer = new IntersectionObserver(
+      const streamUrl = projectStream(project.videoFile);
+
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = streamUrl;
+        video.load();
+        return;
+      }
+
+      const { default: HlsPlayer } = await import('hls.js');
+      if (disposed) return;
+
+      if (HlsPlayer.isSupported()) {
+        hls = new HlsPlayer({
+          autoStartLoad: true,
+          backBufferLength: 20,
+          capLevelToPlayerSize: true,
+          maxBufferLength: 10,
+          maxMaxBufferLength: 30,
+        });
+        hls.on(HlsPlayer.Events.MANIFEST_PARSED, attemptPlay);
+        hls.on(HlsPlayer.Events.ERROR, (_event, data) => {
+          if (data.fatal) loadFallback();
+        });
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+      } else {
+        loadFallback();
+      }
+    };
+    const requestStream = () => {
+      void loadStream().catch(() => {
+        if (!disposed) loadFallback();
+      });
+    };
+
+    const loadObserver = new IntersectionObserver(
       ([entry]) => {
+        if (!entry.isIntersecting) return;
+        requestStream();
+        loadObserver.disconnect();
+      },
+      { rootMargin: '600px 0px', threshold: 0 },
+    );
+    const playObserver = new IntersectionObserver(
+      ([entry]) => {
+        shouldPlay = entry.isIntersecting;
         if (entry.isIntersecting) {
-          startAtOffset();
-          void video.play();
+          requestStream();
+          attemptPlay();
         } else {
           video.pause();
         }
@@ -97,28 +174,38 @@ function AutoplayProjectVideo({ project }: { project: SiteProject }) {
       { threshold: 0.25 },
     );
 
-    video.addEventListener('loadedmetadata', startAtOffset);
-    video.addEventListener('pointerenter', showControls);
-    video.addEventListener('pointerleave', hideControls);
+    video.addEventListener('canplay', attemptPlay);
+    video.addEventListener('playing', expandBuffer);
+    shell.addEventListener('pointerenter', showControls);
+    shell.addEventListener('pointerleave', hideControls);
+    shell.addEventListener('mousemove', showControls);
+    shell.addEventListener('mouseleave', hideControls);
     video.addEventListener('focus', showControls);
     video.addEventListener('blur', hideControls);
-    observer.observe(video);
+    loadObserver.observe(video);
+    playObserver.observe(video);
 
     return () => {
-      observer.disconnect();
-      video.removeEventListener('loadedmetadata', startAtOffset);
-      video.removeEventListener('pointerenter', showControls);
-      video.removeEventListener('pointerleave', hideControls);
+      disposed = true;
+      window.clearTimeout(controlsHideTimer);
+      loadObserver.disconnect();
+      playObserver.disconnect();
+      video.removeEventListener('canplay', attemptPlay);
+      video.removeEventListener('playing', expandBuffer);
+      shell.removeEventListener('pointerenter', showControls);
+      shell.removeEventListener('pointerleave', hideControls);
+      shell.removeEventListener('mousemove', showControls);
+      shell.removeEventListener('mouseleave', hideControls);
       video.removeEventListener('focus', showControls);
       video.removeEventListener('blur', hideControls);
+      hls?.destroy();
     };
-  }, [project.startAt]);
+  }, [project.videoFile]);
 
   return (
-    <div className="project-video-shell">
+    <div ref={shellRef} className="project-video-shell">
       <video
         ref={videoRef}
-        src={`${import.meta.env.BASE_URL}${project.videoFile}`}
         poster={projectImage(project)}
         aria-label={`${project.title} video`}
         tabIndex={0}
