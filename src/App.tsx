@@ -25,9 +25,28 @@ function projectImage(project: SiteProject) {
   return videoPoster(project.videoFile);
 }
 
-function projectStream(videoFile: string) {
+function projectStreamDirectory(videoFile: string) {
   const fileName = videoFile.split('/').pop() ?? '';
-  return `${import.meta.env.BASE_URL}streams/${fileName.replace(/\.mp4$/i, '')}/index.m3u8`;
+  return `${import.meta.env.BASE_URL}streams/${fileName.replace(/\.mp4$/i, '')}`;
+}
+
+function projectStream(videoFile: string) {
+  return `${projectStreamDirectory(videoFile)}/index.m3u8`;
+}
+
+async function preloadProjectOpening(videoFile: string, signal: AbortSignal) {
+  const streamDirectory = projectStreamDirectory(videoFile);
+  const urls = [
+    `${streamDirectory}/index.m3u8`,
+    `${streamDirectory}/init.mp4`,
+    `${streamDirectory}/segment-000.m4s`,
+  ];
+  const responses = await Promise.all(urls.map((url) => fetch(url, { cache: 'force-cache', signal })));
+
+  await Promise.all(responses.map(async (response) => {
+    if (!response.ok) throw new Error(`Unable to preload ${response.url}`);
+    await response.arrayBuffer();
+  }));
 }
 
 const serviceProjectIndexes = [3, 0, 3, 3, 0];
@@ -78,11 +97,13 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
   );
 }
 
-function AutoplayProjectVideo({ project }: { project: SiteProject }) {
+function AutoplayProjectVideo({ project, enabled }: { project: SiteProject; enabled: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!enabled) return;
+
     const video = videoRef.current;
     const shell = shellRef.current;
     if (!video || !shell) return;
@@ -200,7 +221,7 @@ function AutoplayProjectVideo({ project }: { project: SiteProject }) {
       video.removeEventListener('blur', hideControls);
       hls?.destroy();
     };
-  }, [project.videoFile]);
+  }, [enabled, project.videoFile]);
 
   return (
     <div ref={shellRef} className="project-video-shell">
@@ -223,27 +244,56 @@ function App() {
   const [copied, setCopied] = useState('');
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
   const [heroMediaReady, setHeroMediaReady] = useState(false);
+  const [projectVideosReady, setProjectVideosReady] = useState(false);
+  const [projectVideoProgress, setProjectVideoProgress] = useState(0);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
+  const loaderReady = heroMediaReady && projectVideosReady;
+  const loaderProgress = Math.min(1, (projectVideoProgress * 0.9) + (heroMediaReady ? 0.1 : 0));
 
   useEffect(() => {
     if (reduceMotion) setHeroVideoPlaying(false);
   }, [reduceMotion]);
 
   useEffect(() => {
-    const safetyId = window.setTimeout(() => setLoaderVisible(false), 2400);
-    const readyId = heroMediaReady
-      ? window.setTimeout(() => setLoaderVisible(false), reduceMotion ? 0 : 550)
-      : 0;
+    const controller = new AbortController();
+    let active = true;
+    let loadedVideos = 0;
+    const projects = siteConfig.projects.items;
+
+    void Promise.all(projects.map(async (project) => {
+      try {
+        await preloadProjectOpening(project.videoFile, controller.signal);
+        if (active) {
+          loadedVideos += 1;
+          setProjectVideoProgress(loadedVideos / projects.length);
+        }
+      } catch {
+        // A failed preload falls back to the normal on-demand player path.
+      }
+    })).then(() => {
+      if (active && loadedVideos === projects.length) setProjectVideosReady(true);
+    });
 
     return () => {
-      window.clearTimeout(safetyId);
-      window.clearTimeout(readyId);
+      active = false;
+      controller.abort();
     };
-  }, [heroMediaReady, reduceMotion]);
+  }, []);
+
+  useEffect(() => {
+    const safetyId = window.setTimeout(() => setLoaderVisible(false), 12000);
+    return () => window.clearTimeout(safetyId);
+  }, []);
+
+  useEffect(() => {
+    if (!loaderReady) return;
+    const readyId = window.setTimeout(() => setLoaderVisible(false), reduceMotion ? 0 : 550);
+    return () => window.clearTimeout(readyId);
+  }, [loaderReady, reduceMotion]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('site-is-loading', loaderVisible);
@@ -330,7 +380,7 @@ function App() {
       <AnimatePresence>
         {loaderVisible && (
           <motion.div
-            className={`site-loader${heroMediaReady ? ' is-ready' : ''}`}
+            className={`site-loader${loaderReady ? ' is-ready' : ''}`}
             role="status"
             aria-live="polite"
             initial={false}
@@ -342,8 +392,17 @@ function App() {
                 <span className="site-loader-mark" aria-hidden="true">V</span>
                 <strong>{siteConfig.brand.name}</strong>
               </div>
-              <div className="site-loader-track" aria-hidden="true"><span /></div>
-              <p>{heroMediaReady ? 'Ready' : 'Loading portfolio'}</p>
+              <div
+                className="site-loader-track"
+                role="progressbar"
+                aria-label="Loading project videos"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(loaderProgress * 100)}
+              >
+                <span style={{ transform: `scaleX(${Math.max(0.04, loaderProgress)})` }} />
+              </div>
+              <p>{loaderReady ? 'Ready' : 'Loading project videos'}</p>
             </div>
           </motion.div>
         )}
@@ -451,7 +510,7 @@ function App() {
                 transition={{ duration: 0.62, ease: [0.16, 1, 0.3, 1] }}
               >
                 <div className="project-media">
-                  <AutoplayProjectVideo project={project} />
+                  <AutoplayProjectVideo project={project} enabled={!loaderVisible} />
                 </div>
                 <div className="project-copy">
                   <p className="eyebrow">{project.category}</p>
@@ -487,7 +546,7 @@ function App() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.32 }}
             >
-              <AutoplayProjectVideo project={relatedServiceProject} />
+              <AutoplayProjectVideo project={relatedServiceProject} enabled={!loaderVisible} />
             </motion.div>
 
             <div className="systems-panel">

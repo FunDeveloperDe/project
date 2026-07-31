@@ -163,9 +163,8 @@ img {
   height: 100%;
   display: block;
   background: var(--blue);
-  transform: scaleX(0.12);
+  transform: scaleX(0.04);
   transform-origin: left;
-  animation: loader-progress 2.4s var(--ease) forwards;
   transition: transform 220ms var(--ease), background-color 220ms ease;
 }
 
@@ -1247,12 +1246,6 @@ img {
   align-items: center;
   gap: 0.4rem;
   color: var(--white);
-}
-
-@keyframes loader-progress {
-  to {
-    transform: scaleX(0.82);
-  }
 }
 
 @keyframes hero-media-settle {
