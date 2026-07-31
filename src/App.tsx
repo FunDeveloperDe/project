@@ -29,11 +29,10 @@ function youtubeVideoId(videoUrl: string) {
   return url.hostname === 'youtu.be' ? url.pathname.slice(1) : url.searchParams.get('v') ?? '';
 }
 
-function youtubeEmbedUrl(project: SiteProject) {
-  const videoId = youtubeVideoId(project.videoUrl);
+function youtubeEmbedUrl(videoId: string, startAt: number, controls: '0' | '1') {
   const params = new URLSearchParams({
     autoplay: '1',
-    controls: '1',
+    controls,
     enablejsapi: '1',
     iv_load_policy: '3',
     loop: '1',
@@ -42,7 +41,7 @@ function youtubeEmbedUrl(project: SiteProject) {
     playlist: videoId,
     playsinline: '1',
     rel: '0',
-    start: String(project.startAt),
+    start: String(startAt),
     vq: 'hd1080',
   });
 
@@ -131,7 +130,7 @@ function YouTubeProjectVideo({ project }: { project: SiteProject }) {
     <div className="project-video-shell">
       <iframe
         ref={iframeRef}
-        src={youtubeEmbedUrl(project)}
+        src={youtubeEmbedUrl(youtubeVideoId(project.videoUrl), project.startAt, '1')}
         title={`${project.title} video`}
         loading="eager"
         allow="autoplay; encrypted-media; picture-in-picture"
@@ -145,7 +144,7 @@ function App() {
   const [activeService, setActiveService] = useState(0);
   const [copied, setCopied] = useState('');
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
-  const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const heroVideoRef = useRef<HTMLIFrameElement>(null);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
@@ -155,30 +154,15 @@ function App() {
   }, [reduceMotion]);
 
   useEffect(() => {
-    const video = heroVideoRef.current;
-    if (!video) return;
+    const iframe = heroVideoRef.current;
+    if (!iframe) return;
 
-    const startAtOffset = () => {
-      if (video.currentTime < siteConfig.hero.startAt) video.currentTime = siteConfig.hero.startAt;
-    };
-    const restartHeroAtOffset = () => {
-      video.currentTime = siteConfig.hero.startAt;
-      if (heroVideoPlaying && !reduceMotion) void video.play();
-    };
-
-    if (video.readyState >= 1) startAtOffset();
-    video.addEventListener('loadedmetadata', startAtOffset);
-    video.addEventListener('ended', restartHeroAtOffset);
-
-    if (heroVideoPlaying && !reduceMotion) {
-      void video.play();
-    } else {
-      video.pause();
-    }
+    const syncPlayback = () => sendYouTubeCommand(iframe, heroVideoPlaying && !reduceMotion ? 'playVideo' : 'pauseVideo');
+    iframe.addEventListener('load', syncPlayback);
+    syncPlayback();
 
     return () => {
-      video.removeEventListener('loadedmetadata', startAtOffset);
-      video.removeEventListener('ended', restartHeroAtOffset);
+      iframe.removeEventListener('load', syncPlayback);
     };
   }, [heroVideoPlaying, reduceMotion]);
 
@@ -237,16 +221,14 @@ function App() {
               src={videoPoster(siteConfig.hero.videoFile)}
               alt="Realistic FPS shooter gameplay"
             />
-            <video
+            <iframe
               ref={heroVideoRef}
               className="hero-video"
-              src={`${import.meta.env.BASE_URL}${siteConfig.hero.videoFile}`}
-              poster={videoPoster(siteConfig.hero.videoFile)}
+              src={youtubeEmbedUrl(siteConfig.hero.videoId, siteConfig.hero.startAt, '0')}
+              title="Realistic FPS shooter background video"
               aria-hidden="true"
-              muted
-              playsInline
-              autoPlay={!reduceMotion}
-              preload="auto"
+              tabIndex={-1}
+              allow="autoplay; encrypted-media"
             />
           </div>
           <div className="hero-overlay" aria-hidden="true" />

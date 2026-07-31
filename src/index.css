@@ -350,7 +350,8 @@ img {
   animation: hero-media-settle 18s ease-in-out infinite alternate;
 }
 
-.hero-media video {
+.hero-media video,
+.hero-media iframe {
   position: absolute;
   inset: 0;
   z-index: 1;
