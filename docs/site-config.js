@@ -26,7 +26,7 @@ window.__SITE_CONFIG__ = {
     eyebrow: 'Realistic FPS shooter',
     headline: ['Roblox', 'Development'],
     videoId: 'S3APny6lG5I',
-    videoFile: 'videos/realistic-fps-shooter.mp4',
+    videoFile: 'videos/realistic-fps-hero.mp4',
     startAt: 7,
     title: 'Realistic FPS combat, backend code, and tools.',
     description:

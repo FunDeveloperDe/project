@@ -16,12 +16,12 @@ import FloatingNav from './components/FloatingNav';
 import { siteConfig, type SiteProject } from './siteConfig';
 import robloxWordmark from './assets/roblox-wordmark-white.svg';
 
-function getYoutubeId(url: string) {
-  return url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([^?&/]+)/)?.[1] ?? '';
+function videoPoster(videoFile: string) {
+  return `${import.meta.env.BASE_URL}${videoFile.replace(/^videos\//, 'posters/').replace(/\.mp4$/i, '.webp')}`;
 }
 
 function projectImage(project: SiteProject) {
-  return `https://i.ytimg.com/vi/${getYoutubeId(project.videoUrl)}/maxresdefault.jpg`;
+  return videoPoster(project.videoFile);
 }
 
 const serviceProjectIndexes = [3, 0, 3, 3, 0];
@@ -125,7 +125,7 @@ function AutoplayProjectVideo({ project }: { project: SiteProject }) {
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="none"
       />
     </div>
   );
@@ -151,9 +151,14 @@ function App() {
     const startAtOffset = () => {
       if (video.currentTime < siteConfig.hero.startAt) video.currentTime = siteConfig.hero.startAt;
     };
+    const restartHeroAtOffset = () => {
+      video.currentTime = siteConfig.hero.startAt;
+      if (heroVideoPlaying && !reduceMotion) void video.play();
+    };
 
     if (video.readyState >= 1) startAtOffset();
     video.addEventListener('loadedmetadata', startAtOffset);
+    video.addEventListener('ended', restartHeroAtOffset);
 
     if (heroVideoPlaying && !reduceMotion) {
       void video.play();
@@ -161,7 +166,10 @@ function App() {
       video.pause();
     }
 
-    return () => video.removeEventListener('loadedmetadata', startAtOffset);
+    return () => {
+      video.removeEventListener('loadedmetadata', startAtOffset);
+      video.removeEventListener('ended', restartHeroAtOffset);
+    };
   }, [heroVideoPlaying, reduceMotion]);
 
   useEffect(() => {
@@ -216,20 +224,20 @@ function App() {
         <section id="home" className="hero-section">
           <div className="hero-media">
             <img
-              src={`https://i.ytimg.com/vi/${siteConfig.hero.videoId}/maxresdefault.jpg`}
+              src={videoPoster(siteConfig.hero.videoFile)}
               alt="Realistic FPS shooter gameplay"
+              fetchPriority="high"
             />
             <video
               ref={heroVideoRef}
               className="hero-video"
               src={`${import.meta.env.BASE_URL}${siteConfig.hero.videoFile}`}
-              poster={`https://i.ytimg.com/vi/${siteConfig.hero.videoId}/maxresdefault.jpg`}
+              poster={videoPoster(siteConfig.hero.videoFile)}
               aria-hidden="true"
               muted
-              loop
               playsInline
               autoPlay={!reduceMotion}
-              preload="metadata"
+              preload="auto"
             />
           </div>
           <div className="hero-overlay" aria-hidden="true" />
