@@ -34,19 +34,51 @@ function projectStream(videoFile: string) {
   return `${projectStreamDirectory(videoFile)}/index.m3u8`;
 }
 
-async function preloadProjectOpening(videoFile: string, signal: AbortSignal) {
-  const streamDirectory = projectStreamDirectory(videoFile);
-  const urls = [
-    `${streamDirectory}/index.m3u8`,
-    `${streamDirectory}/init.mp4`,
-    `${streamDirectory}/segment-000.m4s`,
-  ];
-  const responses = await Promise.all(urls.map((url) => fetch(url, { cache: 'force-cache', signal })));
-
-  await Promise.all(responses.map(async (response) => {
+async function preloadAllProjectVideos(
+  videoFiles: string[],
+  signal: AbortSignal,
+  onProgress: (progress: number) => void,
+) {
+  const manifests = await Promise.all(videoFiles.map(async (videoFile) => {
+    const manifestUrl = projectStream(videoFile);
+    const response = await fetch(manifestUrl, { cache: 'force-cache', signal });
     if (!response.ok) throw new Error(`Unable to preload ${response.url}`);
-    await response.arrayBuffer();
+
+    const manifest = await response.text();
+    const streamDirectory = projectStreamDirectory(videoFile);
+    const initFile = manifest.match(/#EXT-X-MAP:URI="([^"]+)"/)?.[1];
+    const segmentFiles = manifest
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#'));
+
+    if (!initFile || segmentFiles.length === 0) throw new Error(`Invalid stream manifest: ${manifestUrl}`);
+    return [initFile, ...segmentFiles].map((file) => `${streamDirectory}/${file}`);
   }));
+
+  const assetUrls = manifests.flat();
+  const totalFiles = videoFiles.length + assetUrls.length;
+  let completedFiles = videoFiles.length;
+  let nextAssetIndex = 0;
+
+  onProgress(completedFiles / totalFiles);
+
+  const downloadNextAsset = async () => {
+    while (nextAssetIndex < assetUrls.length) {
+      const assetIndex = nextAssetIndex;
+      nextAssetIndex += 1;
+
+      const response = await fetch(assetUrls[assetIndex], { cache: 'force-cache', signal });
+      if (!response.ok) throw new Error(`Unable to preload ${response.url}`);
+      await response.arrayBuffer();
+
+      completedFiles += 1;
+      onProgress(completedFiles / totalFiles);
+    }
+  };
+
+  const workerCount = Math.min(4, assetUrls.length);
+  await Promise.all(Array.from({ length: workerCount }, () => downloadNextAsset()));
 }
 
 const serviceProjectIndexes = [3, 0, 3, 3, 0];
@@ -245,6 +277,7 @@ function App() {
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
   const [heroMediaReady, setHeroMediaReady] = useState(false);
   const [projectVideosReady, setProjectVideosReady] = useState(false);
+  const [projectVideosFailed, setProjectVideosFailed] = useState(false);
   const [projectVideoProgress, setProjectVideoProgress] = useState(0);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -252,7 +285,8 @@ function App() {
   const reduceMotion = useReducedMotion();
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
   const loaderReady = heroMediaReady && projectVideosReady;
-  const loaderProgress = Math.min(1, (projectVideoProgress * 0.9) + (heroMediaReady ? 0.1 : 0));
+  const loaderCanExit = heroMediaReady && (projectVideosReady || projectVideosFailed);
+  const loaderProgress = Math.min(1, (projectVideoProgress * 0.95) + (heroMediaReady ? 0.05 : 0));
 
   useEffect(() => {
     if (reduceMotion) setHeroVideoPlaying(false);
@@ -261,39 +295,32 @@ function App() {
   useEffect(() => {
     const controller = new AbortController();
     let active = true;
-    let loadedVideos = 0;
-    const projects = siteConfig.projects.items;
+    const timeoutId = window.setTimeout(() => controller.abort(), 120000);
+    const videoFiles = siteConfig.projects.items.map((project) => project.videoFile);
 
-    void Promise.all(projects.map(async (project) => {
-      try {
-        await preloadProjectOpening(project.videoFile, controller.signal);
-        if (active) {
-          loadedVideos += 1;
-          setProjectVideoProgress(loadedVideos / projects.length);
-        }
-      } catch {
-        // A failed preload falls back to the normal on-demand player path.
-      }
-    })).then(() => {
-      if (active && loadedVideos === projects.length) setProjectVideosReady(true);
-    });
+    void preloadAllProjectVideos(videoFiles, controller.signal, (progress) => {
+      if (active) setProjectVideoProgress(progress);
+    })
+      .then(() => {
+        if (active) setProjectVideosReady(true);
+      })
+      .catch(() => {
+        if (active) setProjectVideosFailed(true);
+      })
+      .finally(() => window.clearTimeout(timeoutId));
 
     return () => {
       active = false;
+      window.clearTimeout(timeoutId);
       controller.abort();
     };
   }, []);
 
   useEffect(() => {
-    const safetyId = window.setTimeout(() => setLoaderVisible(false), 12000);
-    return () => window.clearTimeout(safetyId);
-  }, []);
-
-  useEffect(() => {
-    if (!loaderReady) return;
+    if (!loaderCanExit) return;
     const readyId = window.setTimeout(() => setLoaderVisible(false), reduceMotion ? 0 : 550);
     return () => window.clearTimeout(readyId);
-  }, [loaderReady, reduceMotion]);
+  }, [loaderCanExit, reduceMotion]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('site-is-loading', loaderVisible);
@@ -402,7 +429,7 @@ function App() {
               >
                 <span style={{ transform: `scaleX(${Math.max(0.04, loaderProgress)})` }} />
               </div>
-              <p>{loaderReady ? 'Ready' : 'Loading project videos'}</p>
+              <p>{projectVideosFailed ? 'Continuing on demand' : loaderReady ? 'Ready' : 'Downloading project videos'}</p>
             </div>
           </motion.div>
         )}
