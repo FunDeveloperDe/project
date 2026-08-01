@@ -16,17 +16,26 @@ import FloatingNav from './components/FloatingNav';
 import { siteConfig, type SiteProject } from './siteConfig';
 import robloxWordmark from './assets/roblox-wordmark-white.svg';
 
-function videoPoster(videoFile: string) {
-  return `${import.meta.env.BASE_URL}${videoFile.replace(/^videos\//, 'posters/').replace(/\.mp4$/i, '.webp')}`;
-}
-
-function projectImage(project: SiteProject) {
-  return videoPoster(project.videoFile);
-}
-
 function youtubeVideoId(videoUrl: string) {
   const url = new URL(videoUrl);
   return url.hostname === 'youtu.be' ? url.pathname.slice(1) : url.searchParams.get('v') ?? '';
+}
+
+function youtubePosterUrl(videoId: string, quality: 'maxresdefault' | 'hqdefault' = 'maxresdefault') {
+  return `https://i.ytimg.com/vi/${videoId}/${quality}.jpg`;
+}
+
+function YouTubePoster({ videoId, alt, className }: { videoId: string; alt: string; className?: string }) {
+  const [quality, setQuality] = useState<'maxresdefault' | 'hqdefault'>('maxresdefault');
+
+  return (
+    <img
+      className={className}
+      src={youtubePosterUrl(videoId, quality)}
+      alt={alt}
+      onError={() => setQuality('hqdefault')}
+    />
+  );
 }
 
 function youtubeEmbedUrl(videoId: string, startAt: number, controls: '0' | '1') {
@@ -102,35 +111,57 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
 
 function YouTubeProjectVideo({ project }: { project: SiteProject }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [playerVisible, setPlayerVisible] = useState(false);
+  const videoId = youtubeVideoId(project.videoUrl);
 
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
 
     let isVisible = false;
+    let iframeLoaded = false;
+    let revealId = 0;
+    const revealPlayer = () => {
+      if (!isVisible || !iframeLoaded || revealId) return;
+      revealId = window.setTimeout(() => setPlayerVisible(true), 700);
+    };
     const syncPlayback = () => sendYouTubeCommand(iframe, isVisible ? 'playVideo' : 'pauseVideo');
     const observer = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;
         syncPlayback();
+        revealPlayer();
       },
       { threshold: 0.25 },
     );
 
-    iframe.addEventListener('load', syncPlayback);
+    const handleLoad = () => {
+      iframeLoaded = true;
+      syncPlayback();
+      revealPlayer();
+    };
+
+    iframe.addEventListener('load', handleLoad);
     observer.observe(iframe);
 
     return () => {
-      iframe.removeEventListener('load', syncPlayback);
+      iframe.removeEventListener('load', handleLoad);
       observer.disconnect();
+      window.clearTimeout(revealId);
     };
   }, []);
 
   return (
     <div className="project-video-shell">
+      <YouTubePoster
+        className="project-video-poster"
+        videoId={videoId}
+        alt={`${project.title} video preview`}
+      />
       <iframe
         ref={iframeRef}
-        src={youtubeEmbedUrl(youtubeVideoId(project.videoUrl), project.startAt, '1')}
+        className={playerVisible ? 'is-ready' : ''}
+        src={youtubeEmbedUrl(videoId, project.startAt, '1')}
         title={`${project.title} video`}
         loading="eager"
         allow="autoplay; encrypted-media; picture-in-picture"
@@ -144,6 +175,7 @@ function App() {
   const [activeService, setActiveService] = useState(0);
   const [copied, setCopied] = useState('');
   const [heroVideoPlaying, setHeroVideoPlaying] = useState(true);
+  const [heroPlayerVisible, setHeroPlayerVisible] = useState(false);
   const heroVideoRef = useRef<HTMLIFrameElement>(null);
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
@@ -158,11 +190,17 @@ function App() {
     if (!iframe) return;
 
     const syncPlayback = () => sendYouTubeCommand(iframe, heroVideoPlaying && !reduceMotion ? 'playVideo' : 'pauseVideo');
-    iframe.addEventListener('load', syncPlayback);
+    let revealId = 0;
+    const handleLoad = () => {
+      syncPlayback();
+      revealId = window.setTimeout(() => setHeroPlayerVisible(true), 700);
+    };
+    iframe.addEventListener('load', handleLoad);
     syncPlayback();
 
     return () => {
-      iframe.removeEventListener('load', syncPlayback);
+      iframe.removeEventListener('load', handleLoad);
+      window.clearTimeout(revealId);
     };
   }, [heroVideoPlaying, reduceMotion]);
 
@@ -217,13 +255,13 @@ function App() {
       <main>
         <section id="home" className="hero-section">
           <div className="hero-media">
-            <img
-              src={videoPoster(siteConfig.hero.videoFile)}
+            <YouTubePoster
+              videoId={siteConfig.hero.videoId}
               alt="Realistic FPS shooter gameplay"
             />
             <iframe
               ref={heroVideoRef}
-              className="hero-video"
+              className={`hero-video${heroPlayerVisible ? ' is-ready' : ''}`}
               src={youtubeEmbedUrl(siteConfig.hero.videoId, siteConfig.hero.startAt, '0')}
               title="Realistic FPS shooter background video"
               aria-hidden="true"
@@ -407,7 +445,11 @@ function App() {
 
         <section id="about" className="section about-section">
           <div className="about-media">
-            <img src={projectImage(siteConfig.projects.items[0])} alt="Realistic FPS shooter gameplay frame" loading="lazy" />
+            <img
+              src={youtubePosterUrl(youtubeVideoId(siteConfig.projects.items[0].videoUrl))}
+              alt="Realistic FPS shooter gameplay frame"
+              loading="lazy"
+            />
           </div>
           <div className="page-grid about-layout">
             <div className="about-heading">
