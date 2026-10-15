@@ -12,7 +12,7 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
   const [activeSection, setActiveSection] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
   const navItems = useMemo(
-    () => items.filter((item) => ['home', 'work', 'services', 'about', 'contact'].includes(item.id)),
+    () => items.filter((item) => ['home', 'work', 'services', 'contact'].includes(item.id)),
     [items],
   );
 

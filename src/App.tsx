@@ -1,9 +1,8 @@
-﻿import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowDown,
   ArrowUpRight,
-  Braces,
   Check,
   ChevronRight,
   Copy,
@@ -77,8 +76,7 @@ function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
   );
 }
 
-function YouTubeEmbed({ project, compact = false }: { project: SiteProject; compact?: boolean }) {
-  const videoId = youtubeVideoId(project.videoUrl);
+function YouTubeEmbed({ project, compact = false, priority = false }: { project: SiteProject; compact?: boolean; priority?: boolean }) {
   const [loaded, setLoaded] = useState(false);
 
   return (
@@ -87,7 +85,7 @@ function YouTubeEmbed({ project, compact = false }: { project: SiteProject; comp
         <iframe
           src={youtubeEmbedUrl(project.videoUrl, project.startAt)}
           title={project.title + ' demo on YouTube'}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           onLoad={() => setLoaded(true)}
@@ -95,7 +93,7 @@ function YouTubeEmbed({ project, compact = false }: { project: SiteProject; comp
         {!loaded && <div className="youtube-loading" aria-hidden="true"><span />Connecting to YouTube</div>}
       </div>
       <figcaption>
-        <span>{videoId ? 'Demo / ' + videoId : 'Demo'}</span>
+        <span>YouTube demo</span>
         <a href={project.videoUrl} target="_blank" rel="noreferrer">
           Open on YouTube <ExternalLink size={14} />
         </a>
@@ -163,7 +161,7 @@ function App() {
         <section id="home" className="hero-section">
           <div className="page-grid hero-layout">
             <div className="hero-copy">
-              <p className="eyebrow light"><Braces size={15} />{siteConfig.hero.eyebrow}</p>
+              <p className="eyebrow light">{siteConfig.hero.eyebrow}</p>
               <h1>
                 <span className="hero-wordmark"><img src={robloxWordmark} alt={siteConfig.hero.headline[0]} /></span>
                 <strong>{siteConfig.hero.headline[1]}</strong>
@@ -176,21 +174,11 @@ function App() {
               </div>
             </div>
 
-            <aside className="hero-proof" aria-label="Featured project">
-              <div className="proof-label"><span>Field note 01</span><span>FPS / Roblox Studio</span></div>
-              <div className="proof-image"><img src="/posters/realistic-fps-hero.webp" alt="Realistic first-person shooter system running in Roblox Studio" fetchPriority="high" /></div>
-              <div className="proof-caption">
-                <div><strong>Realistic FPS Shooter</strong><span>Weapons, recoil, raycasts, combat feedback</span></div>
-                <a href={siteConfig.projects.items[0].videoUrl} target="_blank" rel="noreferrer" aria-label="Watch the featured FPS demo on YouTube"><ArrowUpRight size={20} /></a>
-              </div>
-            </aside>
+            <div className="hero-video" aria-label="Featured project video">
+              <YouTubeEmbed project={siteConfig.projects.items[0]} compact priority />
+            </div>
           </div>
-          <div className="hero-index" aria-hidden="true">V / 01</div>
         </section>
-
-        <div className="principle-strip" aria-label="Engineering principles">
-          {siteConfig.about.highlights.slice(0, 4).map((item, index) => <span key={item}><b>0{index + 1}</b>{item}</span>)}
-        </div>
 
         <section id="work" className="section work-section">
           <div className="page-grid section-intro">
@@ -203,7 +191,6 @@ function App() {
               <motion.article key={project.title} className="project-row page-grid" variants={reveal} initial={reduceMotion ? false : 'hidden'} whileInView="visible" viewport={{ once: true, margin: '-7%' }} transition={{ duration: 0.46, delay: index * 0.035, ease: [0.2, 0.8, 0.2, 1] }}>
                 <div className="project-media"><YouTubeEmbed project={project} /></div>
                 <div className="project-copy">
-                  <div className="project-number">0{index + 1}</div>
                   <p className="eyebrow">{project.category}</p>
                   <h3>{project.title}</h3>
                   <p>{project.description}</p>
@@ -227,7 +214,7 @@ function App() {
             </motion.div>
             <div className="systems-panel">
               <motion.div key={activeServiceItem.title} id="system-detail" className="system-detail" role="tabpanel" aria-labelledby={'system-tab-' + activeService} initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
-                <span>Core development area</span><h3>{activeServiceItem.title}</h3><p>{activeServiceItem.description}</p>
+                <h3>{activeServiceItem.title}</h3><p>{activeServiceItem.description}</p>
               </motion.div>
               <div className="system-selector" role="tablist" aria-label="Development areas" aria-orientation="vertical">
                 {siteConfig.services.items.map((item, index) => <button key={item.title} ref={(node) => { serviceRefs.current[index] = node; }} id={'system-tab-' + index} role="tab" type="button" tabIndex={activeService === index ? 0 : -1} aria-selected={activeService === index} aria-controls="system-detail" onClick={() => setActiveService(index)} onKeyDown={(event) => handleServiceKeyDown(event, index)}><strong>{item.title}</strong><ChevronRight size={18} /></button>)}
@@ -240,15 +227,6 @@ function App() {
           <div className="page-grid stack-layout">
               <div className="stack-heading"><p className="eyebrow">{siteConfig.skills.eyebrow}</p><h2>Tools I<br />reach for.</h2></div>
             <div className="stack-groups">{siteConfig.skills.groups.map((group) => <div className="stack-group" key={group.category}><h3>{group.category}</h3><ul>{group.items.map((item) => <li key={item}><Check size={14} />{item}</li>)}</ul></div>)}</div>
-          </div>
-        </section>
-
-        <section id="about" className="section about-section">
-          <div className="about-media"><img src="/posters/realistic-fps-shooter.webp" alt="First-person shooter system running in Roblox Studio" loading="lazy" /></div>
-          <div className="page-grid about-layout">
-              <div className="about-heading"><p className="eyebrow light">{siteConfig.about.eyebrow}</p><h2>Feel on the<br />front end.</h2></div>
-            <div className="about-copy">{siteConfig.about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
-            <div className="principle-list" aria-label="Engineering principles">{siteConfig.about.highlights.map((item) => <span key={item}>{item}<i /></span>)}</div>
           </div>
         </section>
 

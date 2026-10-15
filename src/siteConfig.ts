@@ -139,7 +139,6 @@ export const defaultSiteConfig: SiteConfig = {
     { id: 'work', label: 'Projects' },
     { id: 'services', label: 'Services' },
     { id: 'skills', label: 'Stack' },
-    { id: 'about', label: 'About' },
     { id: 'contact', label: 'Contact' },
   ],
   hero: {
@@ -307,7 +306,7 @@ export const defaultSiteConfig: SiteConfig = {
       },
       {
         title: 'Raycast Rendering System',
-        category: 'Rendering experiment',
+        category: 'Real-time rendering',
         description:
           'Custom renderer that samples Roblox scenes with raycasts and draws the result inside the game.',
         outcome:
