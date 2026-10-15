@@ -254,7 +254,7 @@ export const defaultSiteConfig: SiteConfig = {
         title: 'Realistic FPS Shooter',
         category: 'First-person shooter',
         description:
-          'Realistic first-person shooter system with weapon handling, camera motion, responsive firing, raycast hit detection, and combat feedback.',
+          'A realistic first-person shooter system featuring multiple weapons, advanced ragdolls, a comprehensive sound system, and unique gameplay mechanics.',
         outcome:
           'Weapon response, camera recoil, animation, and hit logic stay synchronized through every encounter.',
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Weapon systems', 'Combat feedback'],
@@ -265,7 +265,7 @@ export const defaultSiteConfig: SiteConfig = {
         title: 'Spider-Man Movement System',
         category: 'Traversal system',
         description:
-          'Physics-based traversal controller combining web swinging, wall running, surface climbing, camera tilt, and movement feedback.',
+          'A physics-based, extremely modular movement system with wall running and surface climbing.',
         outcome:
           'Momentum carries between swinging, sprinting, climbing, and wall running without abrupt state changes.',
         stack: ['Roblox Luau', 'Physics', 'Raycasting', 'Camera systems', 'Input handling'],
@@ -276,7 +276,7 @@ export const defaultSiteConfig: SiteConfig = {
         title: 'FPS Pistol System',
         category: 'First-person combat',
         description:
-          'Viewmodel-based pistol system with synchronized animation, camera motion, responsive firing, and raycast hit detection.',
+          'A viewmodel-based pistol system.',
         outcome:
           'Input, animation, camera feedback, and hit logic remain synchronized through each shot.',
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Camera control', 'Input handling'],
@@ -287,7 +287,7 @@ export const defaultSiteConfig: SiteConfig = {
         title: 'Web-Based Game Administration',
         category: 'Live operations',
         description:
-          'External administration interface connected to active Roblox servers through authenticated web requests.',
+          'External admin software that connects to all active Roblox servers to allow remote player administration.',
         outcome:
           'Authorized commands route to the correct servers and synchronize across the live game.',
         stack: ['Roblox Luau', 'HTTPService', 'Web API', 'Cross-server messaging', 'Authentication'],
