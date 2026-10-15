@@ -12,6 +12,39 @@ function youtubeVideoId(videoUrl: string) {
   return '';
 }
 
+function LandingVideo() {
+  const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const project = siteConfig.projects.items[0];
+  const videoId = youtubeVideoId(project.videoUrl);
+  const embedUrl = videoId
+    ? `https://www.youtube-nocookie.com/embed/${videoId}?${new URLSearchParams({
+      autoplay: reducedMotion ? '0' : '1',
+      controls: '0',
+      disablekb: '1',
+      fs: '0',
+      iv_load_policy: '3',
+      loop: '1',
+      modestbranding: '1',
+      mute: '1',
+      playlist: videoId,
+      playsinline: '1',
+      rel: '0',
+      start: String(project.startAt),
+    })}`
+    : project.videoUrl;
+
+  return (
+    <div className="landing-video" aria-hidden="true">
+      <iframe
+        src={embedUrl}
+        title="Realistic FPS Shooter project preview"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        tabIndex={-1}
+      />
+    </div>
+  );
+}
+
 function YouTubeEmbed({ project }: { project: SiteProject }) {
   const [loaded, setLoaded] = useState(false);
   const videoId = youtubeVideoId(project.videoUrl);
@@ -56,8 +89,9 @@ function App() {
       <a className="skip-link" href="#about">Skip to content</a>
 
       <header className="site-header page-width">
-        <a className="site-name" href="#about">{siteConfig.brand.name}</a>
+        <a className="site-name" href="#home">{siteConfig.brand.name}</a>
         <nav aria-label="Main navigation">
+          <a href="#home">Home</a>
           <a href="#about">About</a>
           <a href="#systems">Systems</a>
           <a href="#projects">Projects</a>
@@ -66,6 +100,22 @@ function App() {
       </header>
 
       <main className="page-width">
+        <section id="home" className="landing-section" aria-labelledby="landing-title">
+          <LandingVideo />
+          <div className="landing-shade" aria-hidden="true" />
+          <div className="landing-content page-width">
+            <h1 id="landing-title">Roblox<br />Development</h1>
+            <p>{siteConfig.hero.description}</p>
+            <div className="landing-actions">
+              <a href="#projects">View projects</a>
+              <a href="#availability">Availability</a>
+            </div>
+            <div className="landing-stats" aria-label="Experience">
+              {siteConfig.hero.stats.map((stat) => <span key={stat.label}><strong>{stat.value}</strong> {stat.label}</span>)}
+            </div>
+          </div>
+        </section>
+
         <section id="availability" className="availability-section" aria-labelledby="availability-title">
           <h2 id="availability-title">Availability</h2>
           <p>{siteConfig.hero.availability}</p>
@@ -76,6 +126,7 @@ function App() {
           <h1>About me</h1>
           <p>I build gameplay systems and server-side tools in Roblox Studio. I have been developing for 6 years and working with Roblox for 3.5 years.</p>
           <p>My work includes combat, movement, data, multiplayer systems, and the tools that support a live game.</p>
+          <p>I focus on systems that stay reliable when a game gets busy: responsive client input, server-authoritative state, and data that survives a session. I work in Luau, profile performance, and keep larger features modular so they can grow without replacing the foundation.</p>
         </section>
 
         <section id="projects" className="projects-section" aria-labelledby="projects-title">
@@ -106,6 +157,7 @@ function App() {
               </div>
             ))}
           </div>
+          <p className="systems-note">Built for live games, from the first prototype to the systems that keep running after launch.</p>
         </section>
       </main>
 
