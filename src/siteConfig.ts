@@ -145,7 +145,7 @@ export const defaultSiteConfig: SiteConfig = {
     availabilityLabel: 'Availability',
     availability:
       'Available for commissions across full games, standalone systems, bug fixes, and optimization work.',
-    availabilityHours: 'Monday–Saturday • 8:00 AM – 9:00 PM (GMT2)',
+    availabilityHours: 'Monday–Saturday, 8:00 AM – 9:00 PM (GMT2)',
   },
   services: {
     eyebrow: 'Development scope',
