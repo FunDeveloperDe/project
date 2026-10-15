@@ -129,7 +129,7 @@ window.__SITE_CONFIG__ = {
     eyebrow: 'Selected projects',
     title: 'Six working Roblox systems',
     intro:
-      'Realistic FPS combat, traversal, live administration, procedural terrain, and raycast rendering. Every project includes a video of the system running in Roblox Studio.',
+      'Realistic FPS combat, traversal, live administration, procedural terrain, and raycast rendering. Each project includes a still frame from Roblox Studio and a link to the full demo.',
     previewLabel: 'Video',
     items: [
       {
@@ -276,7 +276,7 @@ window.__SITE_CONFIG__ = {
   boot: {
     label: 'Opening the portfolio',
     steps: [
-      'Loading project videos',
+      'Preparing project previews',
       'Loading system notes',
       'Checking page assets',
       'Ready to view',
