@@ -24,66 +24,28 @@ function youtubeVideoId(videoUrl: string) {
   }
 }
 
-function youtubeEmbedUrl(videoUrl: string, startAt: number) {
+function youtubeEmbedUrl(videoUrl: string, startAt: number, autoplay: boolean, shortPreview: boolean) {
   const videoId = youtubeVideoId(videoUrl);
   const params = new URLSearchParams({
-    autoplay: '0',
+    autoplay: autoplay ? '1' : '0',
+    ...(autoplay ? { mute: '1', loop: '1', playlist: videoId, controls: '0' } : {}),
     modestbranding: '1',
     playsinline: '1',
     rel: '0',
     start: String(startAt),
+    ...(shortPreview ? { end: String(startAt + 8) } : {}),
   });
   return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
 }
 
-function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
-  const [typedLength, setTypedLength] = useState(disabled ? text.length : 0);
-
-  useEffect(() => {
-    if (disabled) {
-      setTypedLength(text.length);
-      return;
-    }
-
-    setTypedLength(0);
-    let intervalId = 0;
-    const startId = window.setTimeout(() => {
-      let nextLength = 0;
-      intervalId = window.setInterval(() => {
-        nextLength += 1;
-        setTypedLength(nextLength);
-        if (nextLength >= text.length) window.clearInterval(intervalId);
-      }, 22);
-    }, 180);
-
-    return () => {
-      window.clearTimeout(startId);
-      window.clearInterval(intervalId);
-    };
-  }, [disabled, text]);
-
-  const isTyping = !disabled && typedLength < text.length;
-
-  return (
-    <span className="typing-text">
-      <span className="visually-hidden">{text}</span>
-      <span className="typing-text-reserve" aria-hidden="true">{text}</span>
-      <span className="typing-text-output" aria-hidden="true">
-        {text.slice(0, typedLength)}
-        {isTyping && <i className="typing-caret" />}
-      </span>
-    </span>
-  );
-}
-
-function YouTubeEmbed({ project, compact = false, priority = false }: { project: SiteProject; compact?: boolean; priority?: boolean }) {
+function YouTubeEmbed({ project, compact = false, priority = false, showCaption = true, autoplay = false, shortPreview = false }: { project: SiteProject; compact?: boolean; priority?: boolean; showCaption?: boolean; autoplay?: boolean; shortPreview?: boolean }) {
   const [loaded, setLoaded] = useState(false);
 
   return (
-    <figure className={compact ? 'youtube-frame youtube-frame-compact' : 'youtube-frame'}>
+    <figure className={`youtube-frame${compact ? ' youtube-frame-compact' : ''}${showCaption ? '' : ' youtube-frame-immersive'}`}>
       <div className="youtube-viewport">
         <iframe
-          src={youtubeEmbedUrl(project.videoUrl, project.startAt)}
+          src={youtubeEmbedUrl(project.videoUrl, project.startAt, autoplay, shortPreview)}
           title={project.title + ' demo on YouTube'}
           loading={priority ? 'eager' : 'lazy'}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -92,12 +54,12 @@ function YouTubeEmbed({ project, compact = false, priority = false }: { project:
         />
         {!loaded && <div className="youtube-loading" aria-hidden="true"><span />Connecting to YouTube</div>}
       </div>
-      <figcaption>
+      {showCaption && <figcaption>
         <span>YouTube demo</span>
         <a href={project.videoUrl} target="_blank" rel="noreferrer">
           Open on YouTube <ExternalLink size={14} />
         </a>
-      </figcaption>
+      </figcaption>}
     </figure>
   );
 }
@@ -161,21 +123,25 @@ function App() {
         <section id="home" className="hero-section">
           <div className="page-grid hero-layout">
             <div className="hero-copy">
-              <p className="eyebrow light">{siteConfig.hero.eyebrow}</p>
               <h1>
                 <span className="hero-wordmark"><img src={robloxWordmark} alt={siteConfig.hero.headline[0]} /></span>
                 <strong>{siteConfig.hero.headline[1]}</strong>
               </h1>
-              <p className="hero-title"><TypingText text={siteConfig.hero.title} disabled={Boolean(reduceMotion)} /></p>
               <p className="hero-description">{siteConfig.hero.description}</p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#work">{siteConfig.hero.primaryCta}<ArrowDown size={17} /></a>
                 <a className="button button-quiet" href="#contact">{siteConfig.hero.secondaryCta}<ArrowUpRight size={17} /></a>
               </div>
+              <div className="hero-details">
+                <div className="hero-stats">
+                  {siteConfig.hero.stats.map((stat, index) => <div key={stat.label} className={index === 0 ? 'stat-primary' : 'stat-secondary'}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}
+                </div>
+                <p className="hero-availability"><strong>{siteConfig.hero.availabilityLabel}</strong><span>{siteConfig.hero.availabilityHours}</span></p>
+              </div>
             </div>
 
-            <div className="hero-video" aria-label="Featured project video">
-              <YouTubeEmbed project={siteConfig.projects.items[0]} compact priority />
+            <div className="hero-video" aria-hidden="true">
+              <YouTubeEmbed project={siteConfig.projects.items[0]} priority showCaption={false} autoplay={!reduceMotion} shortPreview />
             </div>
           </div>
         </section>
@@ -183,7 +149,7 @@ function App() {
         <section id="work" className="section work-section">
           <div className="page-grid section-intro">
             <div className="section-title"><p className="eyebrow">{siteConfig.projects.eyebrow}</p><h2>Systems<br />in play.</h2></div>
-            <p className="section-lede">These are working Roblox systems, documented with the decisions that make them feel reliable in a live game. Start a YouTube demo when you want the motion.</p>
+            <p className="section-lede">Working Roblox systems with the decisions behind them. Watch each demo here, then open the full video on YouTube.</p>
           </div>
 
           <div className="project-list">
@@ -225,7 +191,7 @@ function App() {
 
         <section id="skills" className="section stack-section">
           <div className="page-grid stack-layout">
-              <div className="stack-heading"><p className="eyebrow">{siteConfig.skills.eyebrow}</p><h2>Tools I<br />reach for.</h2></div>
+              <div className="stack-heading"><p className="eyebrow">{siteConfig.skills.eyebrow}</p><h2>{siteConfig.skills.title}</h2></div>
             <div className="stack-groups">{siteConfig.skills.groups.map((group) => <div className="stack-group" key={group.category}><h3>{group.category}</h3><ul>{group.items.map((item) => <li key={item}><Check size={14} />{item}</li>)}</ul></div>)}</div>
           </div>
         </section>

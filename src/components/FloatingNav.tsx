@@ -12,7 +12,7 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
   const [activeSection, setActiveSection] = useState('home');
   const [menuOpen, setMenuOpen] = useState(false);
   const navItems = useMemo(
-    () => items.filter((item) => ['home', 'work', 'services', 'contact'].includes(item.id)),
+    () => items.filter((item) => ['home', 'work', 'services', 'skills', 'contact'].includes(item.id)),
     [items],
   );
 
@@ -54,7 +54,7 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
 
       <a className="header-status" href="#contact">
         <i />
-        <span><small>Availability</small><strong>Open for commissions</strong></span>
+        <span><small>Availability</small><strong>Mon–Sat, 8 AM–9 PM GMT2</strong></span>
         <ArrowUpRight size={18} />
       </a>
 
@@ -79,7 +79,7 @@ export default function FloatingNav({ brandName, items }: FloatingNavProps) {
             transition={{ duration: 0.2 }}
           >
             <a className="mobile-nav-status" href="#contact" onClick={() => setMenuOpen(false)}>
-              <i /><span><small>Availability</small><strong>Open for commissions</strong></span><ArrowUpRight size={18} />
+              <i /><span><small>Availability</small><strong>Mon–Sat, 8 AM–9 PM GMT2</strong></span><ArrowUpRight size={18} />
             </a>
             {navItems.map((item) => (
               <a key={item.id} href={`#${item.id}`} onClick={() => setMenuOpen(false)}>
