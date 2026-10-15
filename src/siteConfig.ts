@@ -5,7 +5,6 @@ export interface SiteProject {
   outcome: string;
   stack: string[];
   videoUrl: string;
-  videoFile: string;
   startAt: number;
 }
 
@@ -30,8 +29,6 @@ export interface SiteConfig {
   hero: {
     eyebrow: string;
     headline: [string, string];
-    videoId: string;
-    videoFile: string;
     startAt: number;
     title: string;
     description: string;
@@ -148,8 +145,6 @@ export const defaultSiteConfig: SiteConfig = {
   hero: {
     eyebrow: 'Realistic FPS shooter',
     headline: ['Roblox', 'Development'],
-    videoId: 'S3APny6lG5I',
-    videoFile: 'videos/realistic-fps-hero.mp4',
     startAt: 7,
     title: 'Realistic FPS combat, backend code, and tools.',
     description:
@@ -264,7 +259,6 @@ export const defaultSiteConfig: SiteConfig = {
           'Weapon response, camera recoil, animation, and hit logic stay synchronized through every encounter.',
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Weapon systems', 'Combat feedback'],
         videoUrl: 'https://youtu.be/S3APny6lG5I',
-        videoFile: 'videos/realistic-fps-shooter.mp4',
         startAt: 7,
       },
       {
@@ -276,7 +270,6 @@ export const defaultSiteConfig: SiteConfig = {
           'Momentum carries between swinging, sprinting, climbing, and wall running without abrupt state changes.',
         stack: ['Roblox Luau', 'Physics', 'Raycasting', 'Camera systems', 'Input handling'],
         videoUrl: 'https://youtu.be/PsKBOt1Od14',
-        videoFile: 'videos/spiderman-movement.mp4',
         startAt: 5,
       },
       {
@@ -288,7 +281,6 @@ export const defaultSiteConfig: SiteConfig = {
           'Input, animation, camera feedback, and hit logic remain synchronized through each shot.',
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Camera control', 'Input handling'],
         videoUrl: 'https://youtu.be/V3xgPGcSTic',
-        videoFile: 'videos/fps-pistol.mp4',
         startAt: 9,
       },
       {
@@ -300,7 +292,6 @@ export const defaultSiteConfig: SiteConfig = {
           'Authorized commands route to the correct servers and synchronize across the live game.',
         stack: ['Roblox Luau', 'HTTPService', 'Web API', 'Cross-server messaging', 'Authentication'],
         videoUrl: 'https://youtu.be/zKCMLSKQytY',
-        videoFile: 'videos/web-administration.mp4',
         startAt: 1,
       },
       {
@@ -312,7 +303,6 @@ export const defaultSiteConfig: SiteConfig = {
           'Chunks generate on demand to limit unnecessary work while preserving biome variation.',
         stack: ['Roblox Luau', 'Procedural generation', 'Noise', 'Chunk loading', 'Asset spawning'],
         videoUrl: 'https://youtu.be/rTRbfrchyrE',
-        videoFile: 'videos/procedural-terrain.mp4',
         startAt: 3,
       },
       {
@@ -324,7 +314,6 @@ export const defaultSiteConfig: SiteConfig = {
           'Geometry, surface data, and lighting influence the image in real time.',
         stack: ['Roblox Luau', 'Raycasting', 'Rendering logic', 'Lighting simulation', 'Optimization'],
         videoUrl: 'https://youtu.be/JkfpLhObRBQ',
-        videoFile: 'videos/raycast-rendering.mp4',
         startAt: 13,
       },
     ],

@@ -1,48 +1,113 @@
 ﻿import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowDown, ArrowUpRight, Braces, Check, ChevronRight, Copy, ExternalLink, ShieldCheck } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUpRight,
+  Braces,
+  Check,
+  ChevronRight,
+  Copy,
+  ExternalLink,
+} from 'lucide-react';
 import FloatingNav from './components/FloatingNav';
 import { siteConfig, type SiteProject } from './siteConfig';
 import robloxWordmark from './assets/roblox-wordmark-white.svg';
 
 const serviceProjectIndexes = [3, 0, 3, 3, 0];
-const posterByTitle: Record<string, string> = {
-  'Realistic FPS Shooter': '/posters/realistic-fps-shooter.webp',
-  'Spider-Man Movement System': '/posters/spiderman-movement.webp',
-  'FPS Pistol System': '/posters/fps-pistol.webp',
-  'Web-Based Game Administration': '/posters/web-administration.webp',
-  'Procedural Terrain Generation': '/posters/procedural-terrain.webp',
-  'Raycast Rendering System': '/posters/raycast-rendering.webp',
-};
-const reveal = { hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0 } };
 
-function posterFor(project: SiteProject) { return posterByTitle[project.title] ?? '/posters/realistic-fps-shooter.webp'; }
+function youtubeVideoId(videoUrl: string) {
+  try {
+    const url = new URL(videoUrl);
+    if (url.hostname === 'youtu.be') return url.pathname.slice(1);
+    return url.searchParams.get('v') ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function youtubeEmbedUrl(videoUrl: string, startAt: number) {
+  const videoId = youtubeVideoId(videoUrl);
+  const params = new URLSearchParams({
+    autoplay: '0',
+    modestbranding: '1',
+    playsinline: '1',
+    rel: '0',
+    start: String(startAt),
+  });
+  return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+}
 
 function TypingText({ text, disabled }: { text: string; disabled: boolean }) {
   const [typedLength, setTypedLength] = useState(disabled ? text.length : 0);
+
   useEffect(() => {
-    if (disabled) { setTypedLength(text.length); return; }
+    if (disabled) {
+      setTypedLength(text.length);
+      return;
+    }
+
     setTypedLength(0);
     let intervalId = 0;
     const startId = window.setTimeout(() => {
       let nextLength = 0;
       intervalId = window.setInterval(() => {
-        nextLength += 1; setTypedLength(nextLength);
+        nextLength += 1;
+        setTypedLength(nextLength);
         if (nextLength >= text.length) window.clearInterval(intervalId);
       }, 22);
-    }, 220);
-    return () => { window.clearTimeout(startId); window.clearInterval(intervalId); };
+    }, 180);
+
+    return () => {
+      window.clearTimeout(startId);
+      window.clearInterval(intervalId);
+    };
   }, [disabled, text]);
+
   const isTyping = !disabled && typedLength < text.length;
-  return <span className="typing-text"><span className="visually-hidden">{text}</span><span className="typing-text-reserve" aria-hidden="true">{text}</span><span className="typing-text-output" aria-hidden="true">{text.slice(0, typedLength)}{isTyping && <i className="typing-caret" />}</span></span>;
+
+  return (
+    <span className="typing-text">
+      <span className="visually-hidden">{text}</span>
+      <span className="typing-text-reserve" aria-hidden="true">{text}</span>
+      <span className="typing-text-output" aria-hidden="true">
+        {text.slice(0, typedLength)}
+        {isTyping && <i className="typing-caret" />}
+      </span>
+    </span>
+  );
 }
 
-function ProjectFrame({ project, compact = false }: { project: SiteProject; compact?: boolean }) {
-  return <figure className={'project-frame' + (compact ? ' project-frame-compact' : '')}>
-    <img src={posterFor(project)} alt={project.title + ' running in Roblox Studio'} loading="lazy" />
-    <figcaption><span>Roblox Studio capture</span><a href={project.videoUrl} target="_blank" rel="noreferrer">Watch demo <ExternalLink size={15} /></a></figcaption>
-  </figure>;
+function YouTubeEmbed({ project, compact = false }: { project: SiteProject; compact?: boolean }) {
+  const videoId = youtubeVideoId(project.videoUrl);
+  const [loaded, setLoaded] = useState(false);
+
+  return (
+    <figure className={compact ? 'youtube-frame youtube-frame-compact' : 'youtube-frame'}>
+      <div className="youtube-viewport">
+        <iframe
+          src={youtubeEmbedUrl(project.videoUrl, project.startAt)}
+          title={project.title + ' demo on YouTube'}
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          onLoad={() => setLoaded(true)}
+        />
+        {!loaded && <div className="youtube-loading" aria-hidden="true"><span />Connecting to YouTube</div>}
+      </div>
+      <figcaption>
+        <span>{videoId ? 'Demo / ' + videoId : 'Demo'}</span>
+        <a href={project.videoUrl} target="_blank" rel="noreferrer">
+          Open on YouTube <ExternalLink size={14} />
+        </a>
+      </figcaption>
+    </figure>
+  );
 }
+
+const reveal = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0 },
+};
 
 function App() {
   const [activeService, setActiveService] = useState(0);
@@ -50,12 +115,17 @@ function App() {
   const serviceRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const reduceMotion = useReducedMotion();
   const relatedServiceProject = siteConfig.projects.items[serviceProjectIndexes[activeService]];
+  const activeServiceItem = siteConfig.services.items[activeService];
 
   useEffect(() => {
     document.title = siteConfig.meta.title;
     const applyMeta = (attribute: 'name' | 'property', key: string, value: string) => {
       let tag = document.head.querySelector('meta[' + attribute + '="' + key + '"]');
-      if (!tag) { tag = document.createElement('meta'); tag.setAttribute(attribute, key); document.head.appendChild(tag); }
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attribute, key);
+        document.head.appendChild(tag);
+      }
       tag.setAttribute('content', value);
     };
     applyMeta('name', 'description', siteConfig.meta.description);
@@ -65,55 +135,134 @@ function App() {
     applyMeta('property', 'og:url', siteConfig.meta.url);
   }, []);
 
-  const copyContact = async (value: string) => { await navigator.clipboard.writeText(value); setCopied(value); window.setTimeout(() => setCopied(''), 1800); };
+  const copyContact = async (value: string) => {
+    await navigator.clipboard.writeText(value);
+    setCopied(value);
+    window.setTimeout(() => setCopied(''), 1800);
+  };
+
   const handleServiceKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const finalIndex = siteConfig.services.items.length - 1; let nextIndex = index;
+    const finalIndex = siteConfig.services.items.length - 1;
+    let nextIndex = index;
     if (event.key === 'ArrowDown' || event.key === 'ArrowRight') nextIndex = index === finalIndex ? 0 : index + 1;
     else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') nextIndex = index === 0 ? finalIndex : index - 1;
     else if (event.key === 'Home') nextIndex = 0;
     else if (event.key === 'End') nextIndex = finalIndex;
     else return;
-    event.preventDefault(); setActiveService(nextIndex); serviceRefs.current[nextIndex]?.focus();
+    event.preventDefault();
+    setActiveService(nextIndex);
+    serviceRefs.current[nextIndex]?.focus();
   };
-  const activeServiceItem = siteConfig.services.items[activeService];
 
-  return <div className="site-shell">
-    <a className="skip-link" href="#work">Skip to projects</a>
-    <FloatingNav brandName={siteConfig.brand.name} items={siteConfig.navigation} />
-    <main>
-      <section id="home" className="hero-section">
-        <div className="hero-media" aria-hidden="true"><img src="/posters/realistic-fps-hero.webp" alt="" fetchPriority="high" /></div>
-        <div className="hero-overlay" aria-hidden="true" /><div className="hero-rule" aria-hidden="true" />
-        <div className="hero-content page-grid"><motion.div className="hero-copy" initial={reduceMotion ? false : { opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}>
-          <p className="eyebrow light"><Braces size={15} />{siteConfig.hero.eyebrow}</p>
-          <h1><img className="roblox-wordmark" src={robloxWordmark} alt={siteConfig.hero.headline[0]} /><strong>{siteConfig.hero.headline[1]}</strong></h1>
-          <p className="hero-title"><TypingText text={siteConfig.hero.title} disabled={Boolean(reduceMotion)} /></p>
-          <p className="hero-description">{siteConfig.hero.description}</p>
-          <div className="hero-stats" aria-label="Experience, minimum project price, and client count">{siteConfig.hero.stats.map((stat) => <div key={stat.label} className="hero-stat"><strong>{stat.value}</strong><small>{stat.label}</small></div>)}</div>
-          <div className="hero-actions"><a className="button button-primary" href="#work">{siteConfig.hero.primaryCta}<ArrowDown size={18} /></a><a className="button button-secondary" href="#contact">{siteConfig.hero.secondaryCta}<ArrowUpRight size={18} /></a></div>
-        </motion.div></div>
-      </section>
+  return (
+    <div className="site-shell">
+      <a className="skip-link" href="#work">Skip to projects</a>
+      <FloatingNav brandName={siteConfig.brand.name} items={siteConfig.navigation} />
 
-      <div className="principle-strip" aria-label="Engineering principles">{siteConfig.about.highlights.map((item) => <span key={item}>{item}</span>)}</div>
+      <main>
+        <section id="home" className="hero-section">
+          <div className="page-grid hero-layout">
+            <div className="hero-copy">
+              <p className="eyebrow light"><Braces size={15} />{siteConfig.hero.eyebrow}</p>
+              <h1>
+                <span className="hero-wordmark"><img src={robloxWordmark} alt={siteConfig.hero.headline[0]} /></span>
+                <strong>{siteConfig.hero.headline[1]}</strong>
+              </h1>
+              <p className="hero-title"><TypingText text={siteConfig.hero.title} disabled={Boolean(reduceMotion)} /></p>
+              <p className="hero-description">{siteConfig.hero.description}</p>
+              <div className="hero-actions">
+                <a className="button button-primary" href="#work">{siteConfig.hero.primaryCta}<ArrowDown size={17} /></a>
+                <a className="button button-quiet" href="#contact">{siteConfig.hero.secondaryCta}<ArrowUpRight size={17} /></a>
+              </div>
+            </div>
 
-      <section id="work" className="section work-section">
-        <div className="section-intro page-grid"><div className="section-title"><p className="eyebrow">{siteConfig.projects.eyebrow}</p><h2>Working<br />systems.</h2></div><p className="section-lede">{siteConfig.projects.intro}</p></div>
-        <div className="project-list">{siteConfig.projects.items.map((project, index) => <motion.article key={project.title} className="project-row page-grid" variants={reveal} initial={reduceMotion ? false : 'hidden'} whileInView="visible" viewport={{ once: true, margin: '-8%' }} transition={{ duration: 0.52, delay: index * 0.03, ease: [0.16, 1, 0.3, 1] }}><div className="project-media"><ProjectFrame project={project} /></div><div className="project-copy"><p className="eyebrow">{project.category}</p><h3>{project.title}</h3><p>{project.description}</p><div className="project-outcome"><ShieldCheck size={18} /><span>{project.outcome}</span></div><ul className="project-stack" aria-label={project.title + ' technologies'}>{project.stack.map((item) => <li key={item}>{item}</li>)}</ul><a className="text-link" href={project.videoUrl} target="_blank" rel="noreferrer">Open demo on YouTube <ArrowUpRight size={17} /></a></div></motion.article>)}</div>
-      </section>
+            <aside className="hero-proof" aria-label="Featured project">
+              <div className="proof-label"><span>Field note 01</span><span>FPS / Roblox Studio</span></div>
+              <div className="proof-image"><img src="/posters/realistic-fps-hero.webp" alt="Realistic first-person shooter system running in Roblox Studio" fetchPriority="high" /></div>
+              <div className="proof-caption">
+                <div><strong>Realistic FPS Shooter</strong><span>Weapons, recoil, raycasts, combat feedback</span></div>
+                <a href={siteConfig.projects.items[0].videoUrl} target="_blank" rel="noreferrer" aria-label="Watch the featured FPS demo on YouTube"><ArrowUpRight size={20} /></a>
+              </div>
+            </aside>
+          </div>
+          <div className="hero-index" aria-hidden="true">V / 01</div>
+        </section>
 
-      <section id="services" className="section systems-section">
-        <div className="page-grid systems-heading"><div><p className="eyebrow light">{siteConfig.services.eyebrow}</p><h2>Scope that fits<br />the build.</h2></div><p>Pick a lane to see the kind of work it includes. The demo frame stays still until you choose to watch it.</p></div>
-        <div className="systems-workbench page-grid"><motion.div key={relatedServiceProject.title} className="systems-media" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}><ProjectFrame project={relatedServiceProject} compact /></motion.div><div className="systems-panel"><motion.div key={activeServiceItem.title} id="system-detail" className="system-detail" role="tabpanel" aria-labelledby={'system-tab-' + activeService} initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}><span>Core development area</span><h3>{activeServiceItem.title}</h3><p>{activeServiceItem.description}</p></motion.div><div className="system-selector" role="tablist" aria-label="Development areas" aria-orientation="vertical">{siteConfig.services.items.map((item, index) => <button key={item.title} ref={(node) => { serviceRefs.current[index] = node; }} id={'system-tab-' + index} role="tab" type="button" tabIndex={activeService === index ? 0 : -1} aria-selected={activeService === index} aria-controls="system-detail" onClick={() => setActiveService(index)} onKeyDown={(event) => handleServiceKeyDown(event, index)}><strong>{item.title}</strong><ChevronRight size={19} /></button>)}</div></div></div>
-      </section>
+        <div className="principle-strip" aria-label="Engineering principles">
+          {siteConfig.about.highlights.slice(0, 4).map((item, index) => <span key={item}><b>0{index + 1}</b>{item}</span>)}
+        </div>
 
-      <section id="skills" className="section stack-section"><div className="page-grid stack-layout"><div className="stack-heading"><p className="eyebrow">{siteConfig.skills.eyebrow}</p><h2>{siteConfig.skills.title}</h2></div><div className="stack-groups">{siteConfig.skills.groups.map((group) => <div className="stack-group" key={group.category}><h3>{group.category}</h3><ul>{group.items.map((item) => <li key={item}><Check size={14} />{item}</li>)}</ul></div>)}</div></div></section>
+        <section id="work" className="section work-section">
+          <div className="page-grid section-intro">
+            <div className="section-title"><p className="eyebrow">{siteConfig.projects.eyebrow}</p><h2>Systems<br />in play.</h2></div>
+            <p className="section-lede">These are working Roblox systems, documented with the decisions that make them feel reliable in a live game. Start a YouTube demo when you want the motion.</p>
+          </div>
 
-      <section id="about" className="section about-section"><div className="about-media"><img src={posterFor(siteConfig.projects.items[0])} alt="First-person shooter system running in Roblox Studio" loading="lazy" /></div><div className="page-grid about-layout"><div className="about-heading"><p className="eyebrow light">{siteConfig.about.eyebrow}</p><h2>{siteConfig.about.title}</h2></div><div className="about-copy">{siteConfig.about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div><div className="principle-list" aria-label="Engineering principles">{siteConfig.about.highlights.map((item) => <span key={item}>{item}<i /></span>)}</div></div></section>
+          <div className="project-list">
+            {siteConfig.projects.items.map((project, index) => (
+              <motion.article key={project.title} className="project-row page-grid" variants={reveal} initial={reduceMotion ? false : 'hidden'} whileInView="visible" viewport={{ once: true, margin: '-7%' }} transition={{ duration: 0.46, delay: index * 0.035, ease: [0.2, 0.8, 0.2, 1] }}>
+                <div className="project-media"><YouTubeEmbed project={project} /></div>
+                <div className="project-copy">
+                  <div className="project-number">0{index + 1}</div>
+                  <p className="eyebrow">{project.category}</p>
+                  <h3>{project.title}</h3>
+                  <p>{project.description}</p>
+                  <div className="project-outcome"><i aria-hidden="true" /><span>{project.outcome}</span></div>
+                  <ul className="project-stack" aria-label={project.title + ' technologies'}>{project.stack.map((item) => <li key={item}>{item}</li>)}</ul>
+                  <a className="text-link" href={project.videoUrl} target="_blank" rel="noreferrer">Open the full demo <ArrowUpRight size={16} /></a>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </section>
 
-      <section id="contact" className="contact-section"><div className="page-grid contact-layout"><div className="contact-heading"><p className="availability-label"><i />{siteConfig.hero.availabilityLabel}</p><h2>{siteConfig.contact.title}</h2></div><div className="contact-copy"><p>{siteConfig.contact.description}</p>{siteConfig.contact.methods.map((method) => method.href ? <a key={method.value} className="contact-link" href={method.href}><span>{method.label}</span><strong>{method.value}</strong><ArrowUpRight size={25} /></a> : <button key={method.value} className="contact-link" type="button" onClick={() => copyContact(method.value)} title={'Copy ' + method.label}><span>{method.label}</span><strong>{method.value}</strong>{copied === method.value ? <Check size={25} /> : <Copy size={25} />}</button>)}<p className="copy-status" aria-live="polite">{copied ? 'Discord handle copied.' : '\u00a0'}</p></div></div></section>
-    </main>
-    <footer className="site-footer"><span>{siteConfig.footer.left}</span><span>{siteConfig.footer.right}</span><a href="#home">Top <ArrowUpRight size={15} /></a></footer>
-  </div>;
+        <section id="services" className="section systems-section">
+          <div className="page-grid systems-heading">
+            <div><p className="eyebrow light">{siteConfig.services.eyebrow}</p><h2>Build around<br />the constraint.</h2></div>
+            <p>Choose a development area to see the kind of problem it solves. The preview updates with the related project.</p>
+          </div>
+          <div className="page-grid systems-workbench">
+            <motion.div key={relatedServiceProject.title} className="systems-media" initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+              <YouTubeEmbed project={relatedServiceProject} compact />
+            </motion.div>
+            <div className="systems-panel">
+              <motion.div key={activeServiceItem.title} id="system-detail" className="system-detail" role="tabpanel" aria-labelledby={'system-tab-' + activeService} initial={reduceMotion ? false : { opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22 }}>
+                <span>Core development area</span><h3>{activeServiceItem.title}</h3><p>{activeServiceItem.description}</p>
+              </motion.div>
+              <div className="system-selector" role="tablist" aria-label="Development areas" aria-orientation="vertical">
+                {siteConfig.services.items.map((item, index) => <button key={item.title} ref={(node) => { serviceRefs.current[index] = node; }} id={'system-tab-' + index} role="tab" type="button" tabIndex={activeService === index ? 0 : -1} aria-selected={activeService === index} aria-controls="system-detail" onClick={() => setActiveService(index)} onKeyDown={(event) => handleServiceKeyDown(event, index)}><strong>{item.title}</strong><ChevronRight size={18} /></button>)}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="skills" className="section stack-section">
+          <div className="page-grid stack-layout">
+              <div className="stack-heading"><p className="eyebrow">{siteConfig.skills.eyebrow}</p><h2>Tools I<br />reach for.</h2></div>
+            <div className="stack-groups">{siteConfig.skills.groups.map((group) => <div className="stack-group" key={group.category}><h3>{group.category}</h3><ul>{group.items.map((item) => <li key={item}><Check size={14} />{item}</li>)}</ul></div>)}</div>
+          </div>
+        </section>
+
+        <section id="about" className="section about-section">
+          <div className="about-media"><img src="/posters/realistic-fps-shooter.webp" alt="First-person shooter system running in Roblox Studio" loading="lazy" /></div>
+          <div className="page-grid about-layout">
+              <div className="about-heading"><p className="eyebrow light">{siteConfig.about.eyebrow}</p><h2>Feel on the<br />front end.</h2></div>
+            <div className="about-copy">{siteConfig.about.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+            <div className="principle-list" aria-label="Engineering principles">{siteConfig.about.highlights.map((item) => <span key={item}>{item}<i /></span>)}</div>
+          </div>
+        </section>
+
+        <section id="contact" className="contact-section">
+          <div className="page-grid contact-layout">
+              <div className="contact-heading"><p className="availability-label"><i />{siteConfig.hero.availabilityLabel}</p><h2>Bring a tricky<br />system.</h2></div>
+            <div className="contact-copy"><p>{siteConfig.contact.description}</p>{siteConfig.contact.methods.map((method) => method.href ? <a key={method.value} className="contact-link" href={method.href}><span>{method.label}</span><strong>{method.value}</strong><ArrowUpRight size={24} /></a> : <button key={method.value} className="contact-link" type="button" onClick={() => copyContact(method.value)} title={'Copy ' + method.label}><span>{method.label}</span><strong>{method.value}</strong>{copied === method.value ? <Check size={24} /> : <Copy size={24} />}</button>)}<p className="copy-status" aria-live="polite">{copied ? 'Discord handle copied.' : '\u00a0'}</p></div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="site-footer"><span>{siteConfig.footer.left}</span><span>{siteConfig.footer.right}</span><a href="#home">Back to top <ArrowUpRight size={15} /></a></footer>
+    </div>
+  );
 }
 
 export default App;
