@@ -34,7 +34,7 @@ window.__SITE_CONFIG__ = {
     availabilityLabel: 'Availability',
     availability:
       'Available for commissions across full games, standalone systems, bug fixes, and optimization work.',
-    availabilityHours: 'Monday–Saturday, 8:00 AM – 9:00 PM (GMT2)',
+    availabilityHours: 'Monday–Saturday • 8:00 AM – 9:00 PM (GMT2)',
   },
   services: {
     eyebrow: 'Development scope',
@@ -143,7 +143,7 @@ window.__SITE_CONFIG__ = {
         title: 'Realistic FPS Shooter',
         category: 'First-person shooter',
         description:
-          'A realistic first-person shooter system featuring multiple weapons, advanced ragdolls, a comprehensive sound system, and unique gameplay mechanics.',
+          'Realistic first-person shooter system with weapon handling, camera motion, responsive firing, raycast hit detection, and combat feedback.',
         outcome:
           'Weapon response, camera recoil, animation, and hit logic stay synchronized through every encounter.',
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Weapon systems', 'Combat feedback'],
@@ -154,7 +154,7 @@ window.__SITE_CONFIG__ = {
         title: 'Spider-Man Movement System',
         category: 'Traversal system',
         description:
-          'A physics-based, extremely modular movement system with wall running and surface climbing.',
+          'Physics-based traversal controller combining web swinging, wall running, surface climbing, camera tilt, and movement feedback.',
         outcome:
           'Momentum carries between swinging, sprinting, climbing, and wall running without abrupt state changes.',
         stack: ['Roblox Luau', 'Physics', 'Raycasting', 'Camera systems', 'Input handling'],
@@ -165,7 +165,7 @@ window.__SITE_CONFIG__ = {
         title: 'FPS Pistol System',
         category: 'First-person combat',
         description:
-          'A viewmodel-based pistol system.',
+          'Viewmodel-based pistol system with synchronized animation, camera motion, responsive firing, and raycast hit detection.',
         outcome:
           'Input, animation, camera feedback, and hit logic remain synchronized through each shot.',
         stack: ['Roblox Luau', 'Viewmodels', 'Raycasting', 'Camera control', 'Input handling'],
@@ -176,7 +176,7 @@ window.__SITE_CONFIG__ = {
         title: 'Web-Based Game Administration',
         category: 'Live operations',
         description:
-          'External admin software that connects to all active Roblox servers to allow remote player administration.',
+          'External administration interface connected to active Roblox servers through authenticated web requests.',
         outcome:
           'Authorized commands route to the correct servers and synchronize across the live game.',
         stack: ['Roblox Luau', 'HTTPService', 'Web API', 'Cross-server messaging', 'Authentication'],
