@@ -247,7 +247,7 @@ export const defaultSiteConfig: SiteConfig = {
     eyebrow: 'Selected projects',
     title: 'Six working Roblox systems',
     intro:
-      'Realistic FPS combat, traversal, live administration, procedural terrain, and raycast rendering. Watch the demos here or open the full videos on YouTube.',
+      'FPS combat, traversal, live administration, airstrike systems, and raycast rendering. Watch the demos here or open the full videos on YouTube.',
     previewLabel: 'Video',
     items: [
       {
@@ -295,15 +295,15 @@ export const defaultSiteConfig: SiteConfig = {
         startAt: 1,
       },
       {
-        title: 'Procedural Terrain Generation',
-        category: 'World generation',
+        title: 'Airstrike System',
+        category: 'Combat system',
         description:
-          'Chunk-based world generator for biome terrain, trees, structures, and environmental detail.',
+          'Timed airstrike system with target marking, warning cues, incoming ordnance, blast effects, and layered audio built around believable battlefield feedback.',
         outcome:
-          'Chunks generate on demand to limit unnecessary work while preserving biome variation.',
-        stack: ['Roblox Luau', 'Procedural generation', 'Noise', 'Chunk loading', 'Asset spawning'],
-        videoUrl: 'https://youtu.be/rTRbfrchyrE',
-        startAt: 3,
+          'Targeting, timing, impact, and area damage stay coordinated from the first warning to the final blast.',
+        stack: ['Roblox Luau', 'Targeting', 'Physics', 'Effects', 'Audio systems'],
+        videoUrl: 'https://youtu.be/TwdzzNQ0Qxw',
+        startAt: 0,
       },
       {
         title: 'Raycast Rendering System',
